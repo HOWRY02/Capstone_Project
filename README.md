@@ -1,1 +1,1 @@
-# Cart_OCR
+# Capstone project
