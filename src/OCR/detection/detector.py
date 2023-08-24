@@ -1,9 +1,7 @@
 import os
 import sys
 from PIL import Image
-
-from detection import Detection
-from argparse import Namespace
+from OCR.paddleocr import PaddleOCR
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
@@ -12,24 +10,19 @@ sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
 
-class Detector(Detection):
-    def __init__(self, args):
+class TextDetector():
+    def __init__(self):
+        self.ocr = PaddleOCR(use_angle_cls=True, lang='en')
 
-        self.args = Namespace(
-            det_algorithm = 'DB', 
-            use_gpu = True, 
-            use_xpu = False, 
-            use_npu = False, 
-            gpu_mem = 500, 
-            gpu_id = 0, 
-            det_db_thresh = 0.3, 
-            det_db_box_thresh = 0.6, 
-            det_db_unclip_ratio = 1.5, 
-            max_batch_size = 10, 
-            use_onnx = False, 
-            benchmark = False
-        )
+    def detector(self, img_path):
+        result = self.ocr.ocr(img_path, cls=True, det=True, rec=False)
 
-    def detector(self, img):
-        dt_boxes, time_pr = self.__call__(img)
+        dt_boxes = []
+        for line in result[0]:
+            dt_boxes.append([[int(line[0][0]), int(line[0][1])], 
+                          [int(line[1][0]), int(line[1][1])], 
+                          [int(line[2][0]), int(line[2][1])], 
+                          [int(line[3][0]), int(line[3][1])]])
+
         return dt_boxes
+
