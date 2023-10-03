@@ -1,0 +1,81 @@
+vi:
+  units:
+  - ml
+  - mg
+  - ui
+  - mcg
+  - g
+  - omg
+  time:
+  - sang
+  - trua
+  - chieu
+  - toi
+  frequency:
+  - moi
+  - lan
+  formulation_type:
+  - vien
+  - goi
+  - chai
+  - but
+  - ong
+  - bo
+  - hop
+  - lo
+  route:
+  - uong
+  - tiem
+  - xit
+  - kho
+  - rua
+  miscellaneous_words:
+  - luong
+  - thoi gian
+en:
+  units:
+  - ml
+  - mg
+  - ui
+  - mcg
+  - g
+  time:
+  - afternoon
+  - night
+  - morning
+  - day
+  - month
+  - week
+  - evening
+  frequency:
+  - times
+  - once
+  - twice
+  - thrice
+  - qid
+  - daily
+  - q4h
+  - q6h
+  - q8h
+  - prn
+  formulation_type:
+  - tab
+  - cap
+  - tablet
+  - capsule
+  - cream
+  - drops
+  - ointment
+  - gel
+  - syrup
+  - bottle
+  route:
+  - oral
+  miscellaneous_words:
+  - rx
+  - breakfast
+  - lunch
+  - meal
+  - after
+  - before
+  - total
