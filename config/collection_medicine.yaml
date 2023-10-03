@@ -1,0 +1,58 @@
+vi:
+  collection_dosage:
+  - sang
+  - trua
+  - chieu
+  - toi
+  - lan
+  - luc
+  - truoc
+  - sau
+  - trong
+  dosage_cases:
+  - sang
+  - trua
+  - chieu
+  - toi
+  collection_timing:
+  - uong luc
+  - truoc an
+  - sau an
+  - trong bua an
+  collection_duration:
+  - ngay
+  - thang
+  - tuan
+en:
+  collection_dosage:
+  - after
+  - before
+  - qid
+  - daily
+  - q4h
+  - q6h
+  - q8h
+  - prn
+  - afternoon
+  - night
+  - morning
+  - evening
+  - aft
+  - eve
+  - times
+  - day
+  dosage_cases:
+  - morning
+  - noon
+  - afternoon
+  - night
+  - evening
+  collection_timing:
+  - before food
+  - after food
+  - before meal
+  - after meal
+  collection_duration:
+  - day
+  - month
+  - week
