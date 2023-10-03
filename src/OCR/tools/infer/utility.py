@@ -10,7 +10,7 @@ import math
 from paddle import inference
 import time
 import random
-from ppocr.utils.logging import get_logger
+from OCR.ppocr.utils.logging import get_logger
 
 
 def str2bool(v):
