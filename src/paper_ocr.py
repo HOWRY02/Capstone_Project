@@ -75,7 +75,6 @@ class PaperOcrParser():
             # box = padding_box(image, box, left_side = 0.001, right_side = 0.005, top_side = 0.06, bottom_side = 0.1)
             cropped_image = get_text_image(image, box)
             cropped_image = Image.fromarray(cropped_image)
-            cropped_image.save(f"src/result/img/cropped_image_{count}.jpg")
             rec_result = self.recognizer.recognize(cropped_image)
             recognition.append(rec_result)
             count += 1
