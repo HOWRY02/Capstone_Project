@@ -1,0 +1,2 @@
+*.pth filter=lfs
+*.pdiparams filter=lfs
