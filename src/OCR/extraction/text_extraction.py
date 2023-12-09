@@ -1,9 +1,6 @@
-import re
 import unidecode
-import datefinder
-from datetime import datetime
-import dateutil.parser as dparser
 from thefuzz import fuzz, process
+from utils.utility import config_form_name_list, config_name_of_column, flatten_comprehension
 
 class TextExtraction(object):
     __instance__ = None
@@ -15,12 +12,13 @@ class TextExtraction(object):
             TextExtraction()
         return TextExtraction.__instance__
 
-    def __init__(self, lang="vi"):
+    def __init__(self):
         if TextExtraction.__instance__ != None:
             raise Exception('Template Matching is a singleton!')
         else:
             TextExtraction.__instance__ = self
-
+            self.form_name_list = config_form_name_list()
+            self.column_name_dict = config_name_of_column()
             self.real_form_name = None
             self.position_of_form_name = []
 
@@ -28,19 +26,32 @@ class TextExtraction(object):
     def find_form_name(self, text):
 
         form_name = None
-        is_form_name = False
+        lower_text = text.lower()
+        ascii_words_in_text = lower_text.split()
+
+        matches_str = process.extract(lower_text, self.form_name_list, scorer=fuzz.token_sort_ratio)
+
+        if matches_str[0][1] > 80:
+            if len(ascii_words_in_text) > 3:
+                form_name = matches_str[0][0]
+
+        return form_name
+    
+
+    def find_column_name(self, text):
+
+        column_name = text
         lower_text = text.lower()
         ascii_text = unidecode.unidecode(lower_text)
 
-        match_str = fuzz.partial_ratio(ascii_text, "don")
-        if match_str > 90:
-            ascii_text_split = ascii_text.split()
-            print(ascii_text_split)
-            if len(ascii_text_split) > 3:
-                form_name = text
-                is_form_name = True
+        matches_str = process.extract(ascii_text, flatten_comprehension(self.column_name_dict.values()), 
+                                      scorer=fuzz.token_sort_ratio)
+        if matches_str[0][1] > 90:
+            for key, value in self.column_name_dict.items():
+                if matches_str[0][0] in value:
+                    column_name = key
 
-        return form_name, is_form_name
+        return column_name
 
 
     def reset_info(self):

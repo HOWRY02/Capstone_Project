@@ -22,7 +22,7 @@ import cv2
 import paddle
 
 import os
-from ppocr.utils.utility import check_install
+from src.OCR.ppocr.utils.utility import check_install
 import sys
 
 

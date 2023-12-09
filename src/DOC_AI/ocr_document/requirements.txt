@@ -1,0 +1,7 @@
+# ocr_form
+pytesseract
+imutils
+opencv-contrib-python
+
+# ocr_non_english
+textblob

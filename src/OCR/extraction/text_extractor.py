@@ -1,9 +1,4 @@
-import cv2
-import yaml
-import unidecode
-import numpy as np
 from src.OCR.extraction.text_extraction import TextExtraction
-from utils.utility import config_collection_medicine, config_common_words_list, flatten_comprehension, config_collection_user_info, process_number
 
 class TextExtractor(TextExtraction):
     __instance__ = None
@@ -15,34 +10,38 @@ class TextExtractor(TextExtraction):
             TextExtractor()
         return TextExtractor.__instance__
 
-    def __init__(self, lang="vi"):
+    def __init__(self):
         if TextExtractor.__instance__ != None:
             raise Exception('Template Matching is a singleton!')
         else:
             TextExtractor.__instance__ = self
 
-        TextExtraction.__init__(self, lang=lang)
+        TextExtraction.__init__(self)
+        self.real_form_name = None
+        self.real_position_of_form_name = None
 
 
-    def extract_form_name(self, text, box):
+    def extract_form_name(self, titles):
         """
         Process the text: find form name on the image
         Input: the raw text, and the position of the text
         """
-        form_name, is_form_name = self.find_form_name(text)
-        if form_name:
-            self.real_form_name = form_name
-        '''
-        Locate the position of the information if they exist
-        '''
-        if is_form_name:
-            self.position_of_form_name.append(box)
+        for i, text in enumerate(titles['text']):
+            form_name = self.find_form_name(text)
+            position_of_form_name = titles['box'][i]
+            if form_name is not None:
+                self.real_form_name = form_name
+                self.real_position_of_form_name = position_of_form_name
 
-        position_follow_up = {'follow_up_schedule': self.position_of_form_name}
-
-        return position_follow_up, is_form_name
+        return self.real_form_name, self.real_position_of_form_name
 
 
-    def classify_form_name(self):
-
-        return self.real_form_name
+    def extract_column_name(self, question_texts):
+        """
+        Process the text: find form name on the image
+        Input: the raw text, and the position of the text
+        """
+        for i, text in enumerate(question_texts):
+            question_texts[i] = self.find_column_name(text)
+            
+        return question_texts

@@ -1,7 +1,6 @@
 import io
 import re
 import cv2
-import json
 import yaml
 import torch
 import base64
@@ -73,12 +72,8 @@ def decode_img(img_base64):
     img = cv2.imdecode(img, flags=cv2.IMREAD_COLOR)
     return img
 
-# define a function for horizontally 
-# concatenating images of different
-# heights 
-def hconcat_resize(img_list, 
-                   interpolation 
-                   = cv2.INTER_CUBIC):
+# define a function for horizontally concatenating images of different heights 
+def hconcat_resize(img_list, interpolation=cv2.INTER_CUBIC):
     # take minimum hights
     h_min = min(img.shape[0] 
                 for img in img_list)
@@ -164,33 +159,6 @@ def vconcat_2_images(image1, image2):
     image2 = cv2.resize(image2, (image1.shape[1], new_w))
     result_img = cv2.vconcat([image1, image2])
     return result_img
-
-def calculate_list_distance(list_combination):
-    # Calculate distance in list pair
-    all_dist = []
-    for cluster in list_combination:
-        pts_dist = []
-        for idx_pt1 in range(len(cluster) - 1):
-            for idx_pt2 in range(idx_pt1 + 1, len(cluster)):
-                pt1 = np.array(cluster[idx_pt1])
-                pt2 = np.array(cluster[idx_pt2])
-                dist = np.linalg.norm(pt1 - pt2)
-                pts_dist.append(dist)
-        all_dist.append(pts_dist)
-    all_dist = np.array(all_dist)
-    return all_dist
-
-def calculate_merging_threshold(det):
-    length_array = []
-    for box in det:
-        bbx = box[:4]
-        length = np.sqrt(pow(bbx[0] - bbx[2], 2) + pow(bbx[1] - bbx[3], 2))
-        length_array.append(length)
-    chosen_idx = np.argmax(np.array(length_array))
-    chosen_box = det[chosen_idx][:4]
-    length = chosen_box[2] - chosen_box[0]
-    margin_threshold = int(length/10) + 1
-    return margin_threshold
 
 def url_image(client, address_server, image, image_name, bucketName):
     """this function to upload image to cloud (MinIO) 
@@ -282,164 +250,22 @@ def is_float(str):
         except ValueError:
             return False
 
-def image_alignment(img, temp_img):
-        """Image aligment using feature-based matching
-        Input: Image
-        Output: Wrapped image """
-        # Convert to gray image
-        cv2.setRNGSeed(0)
-        height = temp_img.shape[0]
-        ratio = round(height/img.shape[0], 3)
-        width = int(img.shape[1]*ratio)
-        dim = (width, height)
-        img = cv2.resize(img, dim, interpolation = cv2.INTER_AREA) 
-
-        input_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        temp_gray = cv2.cvtColor(temp_img.copy(), cv2.COLOR_BGR2GRAY)
-        
-        # Detect feature in both images
-        sift = cv2.SIFT_create()
-        (keypoints1, descriptors1) = sift.detectAndCompute(temp_gray, None)
-        (keypoints2, descriptors2) = sift.detectAndCompute(input_gray, None)
-
-        # Find nearest neighbor between the feature descriptors of the images
-        FLANN_INDEX_KDTREE = 1
-        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-        search_params = dict(checks=40) # or pass empty dictionary
-        flann = cv2.FlannBasedMatcher(index_params,search_params)
-        matches = flann.knnMatch(descriptors2, descriptors1, k=2)
-        # Filter out matches based on distance ratio test
-        good_matches = []
-        for i,(m,n) in enumerate(matches):
-            if m.distance < 0.7*n.distance:
-                good_matches.append(m)
-
-        # Draw matches   
-        matching_result = cv2.drawMatches(img,keypoints2,temp_img,keypoints1,good_matches,None)
-        
-        # Estimate affine transformation using RANSAC
-        input_matches = np.float32([ keypoints2[m.queryIdx].pt for m in good_matches ]).reshape(-1,1,2)
-        template_matches = np.float32([ keypoints1[m.trainIdx].pt for m in good_matches ]).reshape(-1,1,2)
-        M, _ = cv2.estimateAffine2D(input_matches, template_matches, ransacReprojThreshold=10.0)
-
-        # Warp input image to template image
-        inputReg = cv2.warpAffine(img, M, (temp_img.shape[1], temp_img.shape[0]))
-        cv2.imwrite('src/OCR/template_matching/matches.jpg', matching_result)  
-        cv2.imwrite('src/OCR/template_matching/inputReg.jpg', inputReg)
-        return inputReg
-
-def digit_correction(key, text):
-        """
-        Check and correct digit
-        Input: key, text
-        Output: corrected text
-        """
-        # just keep number and dot digit in ID and Age part
-        if key in ['ID', 'Age']:
-            text = re.sub(r"[^0-9]", "", text)
-        # check gender value
-        elif key == 'Gender':
-            if 'Fe' in text or 'em' in text:
-                text = 'Female'
-            else:
-                text= "Male"
-        # remove alphabet digit in "Body Composition Analysis" part
-        elif key == 'Body Composition Analysis':
-            text = re.sub(r"[a-zA-Z]", "", text)
-            text = re.sub(r" ", "" , text)
-            last_index = text.rfind('.')
-            count_digit = len(text) - last_index - 1
-            first_index = text.find('.')
-            text = text[:first_index + count_digit + 1] + ' ' + text[first_index + count_digit:]
-            text = text.split(' ')[0]
-        # just keep number, "+", "-", ".", "/", ":" and " " in the remaining fields.
-        else:
-            text = re.sub(r"[^0-9\+\-./: ]", "", text) 
-            if is_float(text):
-                if 'Control' in key:
-                    if '-' in text or '+' in text:
-                        text = text[0] + str(float(text[1:]))
-                else:
-                    text = str((float(text)))
-        return text
-
 def flatten_comprehension(matrix):
     return [item for row in matrix for item in row]
 
-def config_common_words_list(lang="vi"):
-    with open('config/common_words_list.yaml') as yaml_file:
-        common_words_list = yaml.safe_load(yaml_file)
+def config_form_name_list():
+    with open('config/form_name_list.yaml') as yaml_file:
+        form_name_list = yaml.safe_load(yaml_file)
 
-    common_words_list = common_words_list[lang]
+    form_name_list = form_name_list['form_name']
 
-    return common_words_list
+    return form_name_list
 
-def config_collection_medicine(lang="vi"):
-    with open('config/collection_medicine.yaml') as yaml_file:
-        collection_medicine = yaml.safe_load(yaml_file)
+def config_name_of_column():
+    with open('config/name_of_column.yaml') as yaml_file:
+        name_of_column = yaml.safe_load(yaml_file)
 
-    collection_dosage = collection_medicine[lang]["collection_dosage"]
-    collection_timing = collection_medicine[lang]["collection_timing"]
-    dosage_cases = collection_medicine[lang]["dosage_cases"]
-    collection_duration = collection_medicine[lang]["collection_duration"]
-
-    return collection_dosage, dosage_cases, collection_timing, collection_duration
-
-def config_collection_user_info(lang="vi"):
-    with open('config/collection_user_info.yaml') as yaml_file:
-        collection_user_info = yaml.safe_load(yaml_file)
-
-    collection_name = collection_user_info[lang]["collection_name"]
-    collection_age = collection_user_info[lang]["collection_age"]
-    collection_gender = collection_user_info[lang]["collection_gender"]
-    collection_follow_up = collection_user_info[lang]["collection_follow_up"]
-
-    return collection_name, collection_age, collection_gender, collection_follow_up
-
-def process_number(num_string):
-
-    if num_string is not None:
-        return num_string.replace(',', '.')
-    else:
-        return num_string
-
-def preprocess_text(text):
-    """
-    Add a space between consecutive words
-    Input: the raw text
-    Output: the right format text
-    """
-    pos = []
-    for i in range(1, len(text)):
-        if text[i].isalpha() and text[i-1].isnumeric():
-            pos.append(i)
-        elif (text[i].isnumeric() or text[i].isspace()) and text[i-1].isalpha():
-            pos.append(i)
-
-        if text[i].isalnum() == False:
-            if i != len(text)-1:
-                if text[i+1].isnumeric() and text[i-1].isnumeric():
-                    continue
-            pos.append(i)
-            pos.append(i+1)
-        else:
-            if text[i].islower() and text[i-1].isupper():
-                pos.append(i-1)
-            elif text[i].isupper() and text[i-1].islower():
-                pos.append(i)
-
-    pos.sort(reverse=True)
-    textlist = list(text)
-    for i in pos:
-        textlist.insert(i, ' ')
-    text = ''.join(textlist)
-    text_split = text.split()
-    for i, val in enumerate(text_split):
-        if val == 'I':
-            text_split[i] = '1'
-    text = ' '.join(text_split)
-
-    return text
+    return name_of_column
 
 def padding_box(image, box, left_side = 0.0, right_side = 0.0, top_side = 0.0, bottom_side =0.0):
     """
@@ -475,13 +301,15 @@ def padding_box(image, box, left_side = 0.0, right_side = 0.0, top_side = 0.0, b
 
     return box
 
-
 def get_text_image(img, box):
     """
     Get text image from bounding box
     Input: Image, bounding box
     Output: Text image
     """
+    if np.shape(box) == (4,):
+        box = [[box[0],box[1]],[box[2],box[1]],
+               [box[2],box[3]],[box[0],box[3]]]
     mask = np.zeros_like(img)
     box = np.int32([box])
     cv2.fillPoly(mask, box, (255, 255, 255))
@@ -491,52 +319,20 @@ def get_text_image(img, box):
     text_img = cv2.cvtColor(text_img, cv2.COLOR_BGR2RGB)
     return text_img
 
-
-def draw_result_image(image, solutions):
-    """
-    Draw the result image with the boxes to locate the solutions
-    Input: the raw image and solutions
-    Output: the result image
-    """
-    for solution in solutions:
-        color = tuple(np.random.choice(range(256), size=3).tolist())
-        for key in list(solution.keys()):
-            boxes = solution[key]
-            for i in range(len(boxes)):
-                box = np.int32(boxes[i])
-                cv2.polylines(image, [box], True, color, 1)
-
-        for key in list(solution.keys()):
-            boxes = solution[key]
-            for i in range(len(boxes)):
-                box = boxes[i]
-                cv2.putText(
-                    img = image,
-                    text = key,
-                    org = box[0],
-                    fontFace = cv2.FONT_HERSHEY_TRIPLEX,
-                    fontScale = 0.4,
-                    color = (0, 0, 255),
-                    thickness = 1
-                    )
-
-    return image
-
-
-def draw_boxes_ocr(image, boxes):
+def draw_boxes(image, boxes):
     """
     Draw the boxes
     Input: the raw image and the list of boxes
     Output: the image
     """
+    new_image = image.copy()
     for i in range(len(boxes)):
         box = np.int32(boxes[i])
-        cv2.polylines(image, [box], True, (255,0,0), 1)
+        cv2.polylines(new_image, [box], True, (255,0,0), 1)
 
-    return image
+    return new_image
 
-
-def draw_lines_ocr(image, lines, color=(0, 255, 0)):
+def draw_lines(image, lines, color=(0, 255, 0)):
     """
     Draw the lines
     Input: the raw image and the list of lines
@@ -548,3 +344,157 @@ def draw_lines_ocr(image, lines, color=(0, 255, 0)):
         cv2.line(image, start_point, end_point, color, 2)
 
     return image
+
+def preprocess_image(image):
+    """
+    Preprocess image
+    Input: opencv image
+    Output: preprocessed image
+    """
+    img = cv2.resize(image, None, fx = 10000/image.shape[0], fy = 10000/image.shape[0])
+
+    # Increase contrast
+    lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    l_channel, a, b = cv2.split(lab_img)
+
+    # Applying CLAHE to L-channel
+    # feel free to try different values for the limit and grid size:
+    clahe = cv2.createCLAHE(clipLimit=5.0, tileGridSize=(6,6)) # clipLimit=15.0
+    cl = clahe.apply(l_channel)
+
+    # Merge the CLAHE enhanced L-channel with the a and b channel
+    limg = cv2.merge((cl,a,b))
+
+    # Converting image from LAB Color model to GRAY color space
+    brg_img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+    gray_img = cv2.cvtColor(brg_img, cv2.COLOR_BGR2GRAY)
+
+    # Remove noise
+    thresh = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
+    gray_img = 255 - cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
+
+    # Binarize image
+    gray_img = cv2.adaptiveThreshold(gray_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 155, 11)
+
+    # Erosion
+    kernel_erosion = np.ones((2,2),np.uint8)
+    erosion = cv2.erode(gray_img,kernel_erosion,iterations = 1)
+
+    # Enhance the edges and details
+    kernel_enhancement = np.array([[0, -1, 0],[-1, 5,-1],[0, -1, 0]])
+    erosion = cv2.filter2D(src=erosion, ddepth=-1, kernel=kernel_enhancement)
+
+    # Resize image
+    erosion = cv2.resize(erosion, None, fx = 5000/img.shape[0], fy = 5000/img.shape[0])
+
+    erosion = cv2.cvtColor(erosion, cv2.COLOR_GRAY2BGR)
+
+    return erosion
+
+def draw_result_text(img, text,
+                     font=cv2.FONT_HERSHEY_COMPLEX,
+                     pos=(0, 0),
+                     font_scale=3,
+                     font_thickness=2,
+                     text_color=(0, 0, 0),
+                     text_color_bg=(0, 0, 0)):
+
+    x, y = pos
+    text_size, _ = cv2.getTextSize(text, font, font_scale, font_thickness)
+    text_w, text_h = text_size
+    cv2.rectangle(img, pos, (x + text_w, y + text_h), text_color_bg, -1)
+    cv2.putText(img, text, (x, y + text_h + font_scale - 1), font, font_scale, text_color, font_thickness)
+
+    return text_size
+
+
+def draw_layout_result(image, layout_result, box_width=5, box_alpha=0.2):
+
+    new_image = image.copy()
+    color_of_class = {'text':(0,0,255), 'title':(255,0,0),
+                      'list':(0,255,255), 'table':(0,255,0),
+                      'figure':(127,127,127), 'question':(0,255,255),
+                      'answer':(0,0,255), 'date':(255,0,0)}
+
+    for key_layout, value_layout in layout_result.items():
+        color_of_box = color_of_class[key_layout]
+        # color_of_box = np.random.randint(0, 255, size=3).tolist()
+        for i, box in enumerate(value_layout['box']):
+            overlay = new_image.copy()
+            
+            top_left = (box[0], box[1])
+            bottom_right = (box[2], box[3])
+
+            cv2.rectangle(new_image, top_left, bottom_right, color_of_box, box_width)
+
+            cv2.rectangle(overlay, top_left, bottom_right, color_of_box, -1)
+            new_image = cv2.addWeighted(overlay, box_alpha, new_image, 1 - box_alpha, 0)
+
+            text = key_layout + ' ' + str(round(value_layout['confidence'][i], 2))
+            draw_result_text(new_image, text, font_scale=1, pos=top_left, text_color_bg=(255, 255, 255))
+
+    return new_image
+
+def center_of_box(box):
+    """
+    Find center position of box
+    """
+    if np.shape(box) == (4, 2):
+        center_x = (box[0][0] + box[2][0]) / 2
+        center_y = (box[0][1] + box[2][1]) / 2
+    else:
+        center_x = (box[0] + box[2]) / 2
+        center_y = (box[1] + box[3]) / 2
+
+    return center_x, center_y
+
+def find_relative_position(box_1, box_2):
+    """
+    Find the relative position between box_1 and box_2
+    {'same position':0, 'same row':1, 'same column':2, 'different position':3}
+    Input: box_1, box_2
+    Output: the relative position
+    """
+    # same position, same row, same column, different position
+    relative_position = 3
+    center_x, center_y = center_of_box(box_2)
+    if np.shape(box_1) == (4, 2):
+        x1, y1, x2, y2 = box_1[0][0], box_1[0][1], box_1[3][0], box_1[3][1]
+    else:
+        x1, y1, x2, y2 = box_1[0], box_1[1], box_1[2], box_1[3]
+
+    if (center_x > x1 and center_x < x2) and (center_y > y1 and center_y < y2):
+        relative_position = 0
+    elif center_y > y1 and center_y < y2:
+        relative_position = 1
+    elif center_x > x1 and center_x < x2:
+        relative_position = 2
+    else:
+        relative_position = 3
+    
+    return relative_position
+
+def find_class_of_box(box, layout_result):
+    """
+    Input: box, layout_result
+    Output: dictionary contains box and text in right layout class
+    """
+    center_x, center_y = center_of_box(box)
+
+    for key_layout, value_layout in layout_result.items():
+        for class_box in value_layout['box']:
+            x1, y1, x2, y2 = class_box[0], class_box[1], class_box[2], class_box[3]
+            if (center_x > x1 and center_x < x2) and (center_y > y1 and center_y < y2):
+                return key_layout
+            
+    return 'other'
+
+def remove_special_characters(input_string):
+    # Define a regular expression pattern to match non-alphanumeric characters
+    pattern = re.compile(r'[^a-zA-Z0-9\s]')
+    
+    # Use the pattern to replace non-alphanumeric characters with an empty string
+    result_string = re.sub(pattern, '', input_string)
+    
+    return result_string
