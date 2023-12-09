@@ -1,18 +1,17 @@
-## here is implement REST API
 import cv2
 import yaml
 import json
-import numpy as np
 from PIL import Image
 from io import BytesIO
-from typing import Union
 from pydantic import BaseModel
 from typing_extensions import Annotated
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI, Depends, File, UploadFile, Form
 
-from src.paper_ocr import PaperOcrParser
+from src.template_creater import TemplateCreater
 from src.utils.utility import load_image
+
+is_visualize = False
 
 def read_imagefile(file) -> Image.Image:
     image = Image.open(BytesIO(file))
@@ -21,20 +20,20 @@ def read_imagefile(file) -> Image.Image:
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
 STATUS = doc_config["status"]
-app = FastAPI(title='Documents Extractor')
+app = FastAPI(title='Template Creater')
 
 class Request(BaseModel):
     image: Annotated[UploadFile, File()]
 
-extractor = PaperOcrParser()  # create an instance of the Singleton class
+creater = TemplateCreater()  # create an instance of the Singleton class
 
 # Define the default route 
 @app.get("/")
-async def root(singleton_instance: PaperOcrParser = Depends(lambda: extractor)):
-    return {"message": "Welcome to Documents Extractor!", "instance_id": id(singleton_instance)}
+async def root(singleton_instance: TemplateCreater = Depends(lambda: creater)):
+    return {"message": "Welcome to Template Creater!", "instance_id": id(singleton_instance)}
 
 # input is image link
-@app.post("/document/rec")
+@app.post("/template/rec")
 async def extracting(image: Annotated[UploadFile, File(...)],
                      visualize: str = Form(..., description = "y/n")):
 
@@ -60,19 +59,17 @@ async def extracting(image: Annotated[UploadFile, File(...)],
             is_visualize = True
         else:
             is_visualize = False
-        info, status, [boxes_img,layout_img,form_img] = extractor.extract_info(img, is_visualize)
+        template, status, [form_img] = creater.create(img, is_visualize)
         result = JSONResponse(status_code = int(status), 
                 content = {"status_code": status, 
                         "message": STATUS[status],
-                        "result": info
+                        "result": template
                         })
         
-        with open('src/result/result.json', 'w', encoding='utf-8') as outfile:
-            json.dump(info, outfile, ensure_ascii=False)
-        
+        with open('src/result/template.json', 'w', encoding='utf-8') as outfile:
+            json.dump(template, outfile, ensure_ascii=False)
+
         if is_visualize:
-            cv2.imwrite(f'src/result/boxes_img.jpg', boxes_img)
-            cv2.imwrite(f'src/result/layout_img.jpg', layout_img)
             cv2.imwrite(f'src/result/form_img.jpg', form_img)
         
     return result
