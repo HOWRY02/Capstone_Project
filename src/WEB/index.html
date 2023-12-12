@@ -8,10 +8,53 @@
 <body>
   <div class="container">
     <div class="left-column">
-      <!-- <input type="file" id="imageInput" accept="image/*">
+      <!-- <input type="file" id="imageInput" accept="image/*"> -->
+
+      <form action="/extracting" enctype="multipart/form-data" method="POST">
+        <input type="file" id="imageInput" name="imageInput" accept="image/*"/>
+        <!-- <input type="submit" /> -->
+        <button id="submitButton" onclick="setMode('submit')">Submit</button>
+      </form>
+
+      <input id="hiddenImageName" type="hidden" value="{{ imageName }}">
+      <!-- <div id="hiddenImageName" style="display: none;">{{ imageName }}</div> -->
+      <div id="hiddenJsonData" style="display: none;">{{ jsonData }}</div>
+
+      <div class="buttons-container">
+        <button id="titleButton" class="title" onclick="setMode('title')">Title Mode</button>
+        <button id="questionButton" class="question" onclick="setMode('question')">Question Mode</button>
+        <button id="dateButton" class="date" onclick="setMode('date')">Date Mode</button>
+      </div>
+
       <div class="image-container">
         <canvas id="imageCanvas"></canvas>
-      </div> -->
+      </div>
+    </div>
+
+    <div class="right-column">
+      <input type="text" id="textInput" placeholder="Enter text for selected box">
+      <input type="file" id="loadInput" accept=".json">
+      <button id="saveButton">Save Boxes</button>
+    </div>
+  </div>
+  <script src="{{ url_for('static', path='/script.js') }}"></script>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Certificate Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="left-column">
+      <-- <input type="file" id="imageInput" accept="image/*">
+      <div class="image-container">
+        <canvas id="imageCanvas"></canvas>
+      </div> --
       <form action="/extracting" enctype="multipart/form-data" method="POST">
         <input type="file" id="imageInput" name="imageInput" accept="image/*"/>
         <input type="submit" />
@@ -32,4 +75,4 @@
   </div>
   <script src="{{ url_for('static', path='/script.js') }}"></script>
 </body>
-</html>
+</html> -->

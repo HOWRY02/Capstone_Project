@@ -1,73 +1,133 @@
 body {
   font-family: Arial, sans-serif;
-  }
-  
-  .image-container {
+}
+
+.image-container {
   position: relative;
-  }
-  
-  #imageCanvas {
+}
+
+#imageCanvas {
   border: 1px solid #ccc;
-  }
-  .container {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-  
-  .left-column {
-  flex: 0 0 50%; /* Adjust the width as needed */
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.left-column {
+  flex: 0 0 50%;
+  /* Adjust the width as needed */
   position: relative;
-  }
-  
-  .right-column {
-  flex: 0 0 45%; /* Adjust the width as needed */
+}
+
+.right-column {
+  flex: 0 0 45%;
+  /* Adjust the width as needed */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-left: 20px; /* Add space between left and right columns */
-  }
-  
-  #textInput {
-  margin-bottom: 10px; /* Add some space between input and button */
-  }
-  
-  #saveButton {
+  margin-left: 20px;
+  /* Add space between left and right columns */
+}
+
+#textInput {
+  margin-bottom: 10px;
+  /* Add some space between input and button */
+}
+
+#submitButton {
+  padding: 8px 15px;
+  /* color: #fff; */
+  border: none;
+  cursor: pointer;
+}
+
+/* Optional: You can add more styling to the button (hover effects, etc.) */
+#submitButton:hover {
+  background-color: #898a8a;
+}
+
+#questionButton {
+  padding: 8px 15px;
+  background-color: #1aff2d;
+  /* color: #fff; */
+  border: none;
+  cursor: pointer;
+}
+
+/* Optional: You can add more styling to the button (hover effects, etc.) */
+#questionButton:hover {
+  background-color: #13b258;
+}
+
+
+#titleButton {
+  padding: 8px 15px;
+  background-color: #ff1a1a;
+  /* color: #fff; */
+  border: none;
+  cursor: pointer;
+}
+
+/* Optional: You can add more styling to the button (hover effects, etc.) */
+#titleButton:hover {
+  background-color: #cc0853;
+}
+
+#dateButton {
+  padding: 8px 15px;
+  background-color: #23f0ff;
+  /* color: #fff; */
+  border: none;
+  cursor: pointer;
+}
+
+/* Optional: You can add more styling to the button (hover effects, etc.) */
+#dateButton:hover {
+  background-color: #0eaab6;
+}
+
+#saveButton {
   padding: 8px 15px;
   background-color: #3498db;
   color: #fff;
   border: none;
   cursor: pointer;
-  }
-  
-  /* Optional: You can add more styling to the button (hover effects, etc.) */
-  #saveButton:hover {
+}
+
+/* Optional: You can add more styling to the button (hover effects, etc.) */
+#saveButton:hover {
   background-color: #2980b9;
-  }
-  
-  /* Additional styling for input[type="file"] and #textInput */
-  input[type="file"], #textInput {
-    font-size: 14px;
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-    box-sizing: border-box;
-    margin-bottom: 10px; /* Add some space between input elements */
-  }
-  
-  input[type="file"]:hover, #textInput:hover {
-    background-color: #f0f0f0;
-  }
-  
-  input[type="file"]:focus, #textInput:focus {
-    outline: none;
-    border-color: #3498db; /* Change border color on focus */
-  }
-  
-  /* Style for the 'Choose File' button on hover */
-  input[type="file"]:hover {
-    background-color: #e0e0e0;
-  }
-  
-  
+}
+
+/* Additional styling for input[type="file"] and #textInput */
+input[type="file"],
+#textInput {
+  font-size: 14px;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  /* Add some space between input elements */
+}
+
+input[type="file"]:hover,
+#textInput:hover {
+  background-color: #f0f0f0;
+}
+
+input[type="file"]:focus,
+#textInput:focus {
+  outline: none;
+  border-color: #3498db;
+  /* Change border color on focus */
+}
+
+/* Style for the 'Choose File' button on hover */
+input[type="file"]:hover {
+  background-color: #e0e0e0;
+}

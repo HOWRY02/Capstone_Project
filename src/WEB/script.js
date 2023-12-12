@@ -1,6 +1,13 @@
 const imageInput = document.getElementById('imageInput');
 const imageCanvas = document.getElementById('imageCanvas');
 const ctx = imageCanvas.getContext('2d');
+// const imageInput = document.getElementById("hiddenImageName");
+// let boxes = document.getElementById("hiddenJsonData").textContent;
+// const jsonData = JSON.parse(document.getElementById("hiddenJsonData").textContent);
+// let img = document.getElementById("hiddenImageName").value;
+// console.log(img)
+// console.log(boxes)
+
 let img;
 let isDragging = false; // Flag to track dragging action
 let mouseX, mouseY;
@@ -9,15 +16,58 @@ let boxes = []; // Array to store box coordinates
 let resizingBox = null; // Variable to track the box being resized
 let isResizing = false; // Flag to track resize status
 
-// let scale = 1;
-// let img = null;
+// Variables to store the current mode
+let currentMode = 'title'; // Default mode is 'title'
+let colorTitle = 'red';
+let colorQuestion = 'green';
+let colorDate = 'blue';
+let currentColor = colorTitle;
+// Threshold for removing small boxes automatically
+removeThreshold = 5;
+
+// Function to set the current mode
+function setMode(mode, color) {
+  currentMode = mode;
+  currentColor = color
+  draw(); // Redraw the canvas based on the selected mode
+}
+// Function to remove boxes with absolute height or width < 0.5
+function removeSmallBoxes() {
+  boxes = boxes.filter(box => Math.abs(box.width) >= removeThreshold && Math.abs(box.height) >= removeThreshold);
+  draw(); // Redraw the canvas after removing small boxes
+}
+
+// Draw
 function draw() {
+  // console.log(currentMode)
   ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
   ctx.drawImage(img, 0, 0, img.width, img.height);
 
   boxes.forEach((box, index) => {
-    ctx.strokeStyle = selectedBox === box ? 'blue' : 'red';
-    ctx.lineWidth = 0.6;
+    // console.log(box.class)
+    switch (box.class) {
+      case 'title':
+        ctx.strokeStyle = colorTitle;
+        ctx.strokeStyle = colorTitle; // Set red color for 'title' class
+        currentColor = colorTitle;
+        break;
+      case 'question':
+        ctx.strokeStyle = colorQuestion; // Set violet color for 'question' class
+        ctx.strokeStyle = colorQuestion;
+        currentColor = colorQuestion;
+        break;
+      case 'date':
+        ctx.strokeStyle = colorDate; // Set violet color for 'question' class
+        ctx.strokeStyle = colorDate;
+        currentColor = colorDate;
+        break;
+      default:
+        ctx.strokeStyle = currentColor; // Set default color if no specific class matches
+        break;
+    }
+
+    ctx.strokeStyle = selectedBox === box ? 'blue' : currentColor;
+    ctx.lineWidth = 1.5;
     ctx.strokeRect(box.startX, box.startY, box.width, box.height);
 
     // **Comment out the following code to remove the circle**
@@ -61,9 +111,66 @@ function adjustInputElementsSize() {
     button.style.fontSize = `${scaleFactor * 14}px`; // Adjust button font size
     button.style.padding = `${scaleFactor * 8}px ${scaleFactor * 16}px`; // Adjust button padding
   });
+
+  // Adjust padding for question and title buttonz
+  const button_class = document.querySelectorAll('#submitButton, #questionButton, #titleButton, #dateButton');
+  button_class.forEach(button => {
+    button.style.fontSize = `${scaleFactor * 12}px`; // Adjust button font size
+    button.style.padding = `${scaleFactor * 6}px ${scaleFactor * 13}px`; // Adjust button padding
+  });
 }
+
+// Call the function to delete all boxes
+function deleteAllBoxes() {
+  // Check if there are boxes in the array
+  if (boxes.length > 0) {
+    // Remove all boxes from the array
+    boxes.splice(0, boxes.length);
+    selectedBox = null; // Clear the selectedBox reference
+    draw(); // Redraw the canvas after removing all the boxes
+  }
+}
+
 // Adding an event listener to 'imageInput' element when a file is selected
+// imageInput.addEventListener('change', function (event) {
+//   // delete Allboxes if there are any 
+//   deleteAllBoxes()
+//   // Retrieving the selected file
+//   const file = event.target.files[0];
+
+//   // Checking if a file is selected
+//   if (file) {
+//     // Creating a new instance of FileReader
+//     const reader = new FileReader();
+
+//     // Event triggered when FileReader finishes reading the file
+//     reader.onload = function (e) {
+//       // Creating a new Image object
+//       img = new Image();
+
+//       // Event triggered when the image has finished loading
+//       img.onload = function () {
+//         // Setting the canvas dimensions to match the loaded image
+//         imageCanvas.width = img.width;
+//         imageCanvas.height = img.height;
+
+//         adjustInputElementsSize(); // Call function to adjust input elements size
+//         // Drawing the image on the canvas
+//         ctx.drawImage(img, 0, 0, img.width, img.height);
+//       };
+
+//       // Setting the source of the image to the result of FileReader
+//       img.src = e.target.result;
+//     };
+
+//     // Reading the selected file as a data URL
+//     reader.readAsDataURL(file);
+//   }
+// });
+
 imageInput.addEventListener('change', function (event) {
+  // delete Allboxes if there are any 
+  deleteAllBoxes()
   // Retrieving the selected file
   const file = event.target.files[0];
 
@@ -98,45 +205,64 @@ imageInput.addEventListener('change', function (event) {
 });
 
 function findHandle(x, y) {
+  // Iterate through all the boxes in the 'boxes' array
   for (let i = 0; i < boxes.length; i++) {
-    const box = boxes[i];
+    const box = boxes[i]; // Get the current box
 
     let topLeftX, topLeftY, bottomRightX, bottomRightY;
 
-    if (box.width >= 0 && box.height >= 0) {
+    // Determine coordinates of the top-left and bottom-right corners of the box
+    if (box.width > 0 && box.height > 0) {
       topLeftX = box.startX;
       topLeftY = box.startY;
       bottomRightX = box.startX + box.width;
       bottomRightY = box.startY + box.height;
-    } else {
-      bottomRightX = box.startX;
+    } else if (box.width > 0 && box.height < 0) {
+      topLeftX = box.startX;
+      topLeftY = box.startY + box.height;
+      bottomRightX = box.startX + box.width;
       bottomRightY = box.startY;
+    } else if (box.width < 0 && box.height < 0) {
       topLeftX = box.startX + box.width;
       topLeftY = box.startY + box.height;
+      bottomRightX = box.startX;
+      bottomRightY = box.startY;
+    } else {
+      topLeftX = box.startX + box.width;
+      topLeftY = box.startY;
+      bottomRightX = box.startX;
+      bottomRightY = box.startY + box.height;
     }
 
+    // Calculate the center of the box
     const centerX = bottomRightX;
     const centerY = bottomRightY;
 
+    // Calculate the distance between the mouse pointer and the center of the box
     const distX = x - centerX;
     const distY = y - centerY;
     const distance = Math.sqrt(distX * distX + distY * distY);
 
+    // If the distance is within a threshold (6 in this case), consider it a resize handle
     if (distance <= 6) {
-      return { type: 'resize', boxIndex: i };
+      return { type: 'resize', boxIndex: i }; // Return resize handle type and box index
     }
 
+    // Check if the mouse pointer is inside the bounding box of the current box
     if (
       x >= Math.min(topLeftX, bottomRightX) &&
       x <= Math.max(topLeftX, bottomRightX) &&
       y >= Math.min(topLeftY, bottomRightY) &&
       y <= Math.max(topLeftY, bottomRightY)
     ) {
-      return { type: 'drag', boxIndex: i };
+      return { type: 'drag', boxIndex: i }; // Return drag type and box index
     }
   }
+
+  // If no box or handle is found under the mouse pointer, return type 'none' and box index -1
   return { type: 'none', boxIndex: -1 };
 }
+
 
 // Adding a mousedown event listener to the imageCanvas
 imageCanvas.addEventListener('mousedown', (e) => {
@@ -170,7 +296,7 @@ imageCanvas.addEventListener('mousedown', (e) => {
       // If a new box creation action is detected
       isDragging = true;
       // Creating a new box at the clicked position with initial dimensions
-      const box = { startX: mouseX, startY: mouseY, width: 10, height: 10 };
+      const box = { startX: mouseX, startY: mouseY, width: 0, height: 0, class: currentMode };
       boxes.push(box); // Adding the new box to the boxes array
       selectedBox = box; // Setting the newly created box as selected
     }
@@ -209,6 +335,7 @@ imageCanvas.addEventListener('mousemove', (e) => {
       resizingBox.height = Math.max(0, mouseY - resizingBox.startY);
     }
 
+    // clearSmallBoxes()
     // Redraw the canvas to reflect box movement or resizing
     draw();
   }
@@ -231,6 +358,8 @@ imageCanvas.addEventListener('mouseup', () => {
 
     draw(); // Redraw the canvas after handling the mouseup event
   }
+
+  removeSmallBoxes() // Remove small boxes after the mouse is released
 });
 
 // Function to handle keydown events
@@ -292,14 +421,37 @@ imageCanvas.addEventListener('contextmenu', (e) => {
 
 // Function to save boxes to a JSON file
 function saveBoxes() {
-  // Create an array containing boxes data (startX, startY, width, height, and text)
-  const boxesToSave = boxes.map(box => ({
-    startX: box.startX,
-    startY: box.startY,
-    width: box.width,
-    height: box.height,
-    text: box.text || '' // Ensure text property exists or set it to an empty string
-  }));
+
+  console.log(boxes)
+
+  const boxesToSave = boxes.map(box => {
+
+    let topLeftX, topLeftY, bottomRightX, bottomRightY;
+
+    if (box.width > 0 && box.height > 0) {
+      topLeftX = box.startX;
+      topLeftY = box.startY;
+      bottomRightX = box.startX + box.width;
+      bottomRightY = box.startY + box.height;
+    } else if (box.width > 0 && box.height < 0) {
+      topLeftX = box.startX;
+      topLeftY = box.startY + box.height;
+      bottomRightX = box.startX + box.width;
+      bottomRightY = box.startY;
+    } else if (box.width < 0 && box.height < 0) {
+      topLeftX = box.startX + box.width;
+      topLeftY = box.startY + box.height;
+      bottomRightX = box.startX;
+      bottomRightY = box.startY;
+    } else {
+      topLeftX = box.startX + box.width;
+      topLeftY = box.startY;
+      bottomRightX = box.startX;
+      bottomRightY = box.startY + box.height;
+    }
+
+    return { box: [topLeftX, topLeftY, bottomRightX, bottomRightY], text: box.text, class: box.class }
+  });
 
   // Convert boxes data to JSON string
   const dataToSave = JSON.stringify(boxesToSave);
@@ -332,11 +484,12 @@ function loadBoxes(event) {
 
       // Load boxes with their associated text from the loaded data
       boxes = loadedData.map(data => ({
-        startX: data.startX,
-        startY: data.startY,
-        width: data.width,
-        height: data.height,
-        text: data.text || '' // Ensure text property exists or set it to an empty string
+        startX: data.box[2],
+        startY: data.box[3],
+        width: data.box[0] - data.box[2],
+        height: data.box[1] - data.box[3],
+        text: data.text || '', // Ensure text property exists or set it to an empty string
+        class: data.class
       }));
 
       draw(); // Redraw the canvas with the loaded boxes
@@ -360,6 +513,8 @@ inputText.addEventListener('keypress', function (e) {
   }
 });
 
+
+
 // Event listener for input element to load JSON file
 const loadInput = document.getElementById('loadInput');
 loadInput.addEventListener('change', loadBoxes); // When the file input changes, trigger the loadBoxes function
@@ -367,3 +522,24 @@ loadInput.addEventListener('change', loadBoxes); // When the file input changes,
 // Event listener for saving boxes when a button is clicked
 const saveButton = document.getElementById('saveButton');
 saveButton.addEventListener('click', saveBoxes); // When the button is clicked, trigger the saveBoxes function
+
+// Select the buttons
+const titleModeBtn = document.getElementById('titleModeBtn');
+const questionModeBtn = document.getElementById('questionModeBtn');
+const dateModeBtn = document.getElementById('dateModeBtn');
+
+// Event listener for the 'Title Mode' button
+titleModeBtn.addEventListener('click', function () {
+  setMode('title', colorTitle); // Set mode to 'title' with red color
+});
+
+// Event listener for the 'Question Mode' button
+questionModeBtn.addEventListener('click', function () {
+  setMode('question', colorQuestion); // Set mode to 'question' with green color
+});
+
+// Event listener for the 'Question Mode' button
+dateModeBtn.addEventListener('click', function () {
+  setMode('date', colorDate); // Set mode to 'date' with violet color
+});
+

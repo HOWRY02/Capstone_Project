@@ -48,14 +48,15 @@ async def extracting(request: Request,
                         })
     else:
         img = load_image(imageInput.file)
-        template, status, [form_img] = creater.create(img, False)
+        template, status, [image, form_img] = creater.create(img, False)
         result = JSONResponse(status_code = int(status), 
                 content = {"status_code": status, 
                         "message": STATUS[status],
                         "result": template
                         })
-        
-        with open('src/result/template.json', 'w', encoding='utf-8') as outfile:
+
+        with open('result/template.json', 'w', encoding='utf-8') as outfile:
             json.dump(template, outfile, ensure_ascii=False)
-        
-    return templates.TemplateResponse("index.html", {"request": request,"imageCanvas": imageInput.filename,"jsonData": template})
+
+    return templates.TemplateResponse("index.html", {"request": request, "imageName": image, "jsonData": template})
+

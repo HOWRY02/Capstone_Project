@@ -6,7 +6,6 @@ import yaml
 import logging
 import unidecode
 from PIL import Image
-from collections import namedtuple
 from src.OCR.recognition.text_recognizer import TextRecognizer
 from src.OCR.extraction.text_extractor import TextExtractor
 from src.DOC_AI.form_understanding.form_understand import FormUnderstand
@@ -50,11 +49,10 @@ class TemplateCreater():
         """
         start_time = time.time()
         status_code = "200"
-        # TemplateItem = namedtuple('TemplateItem', ['key', 'bbox', 'text'])
-        # template = [TemplateItem('title', [], []),
-        #             TemplateItem('question', [], [])]
-        template = {'title':     {'box':[], 'text':[]},
-                    'question':  {'box':[], 'text':[]}}
+
+        template = {'title':    {'box':[], 'text':[]},
+                    'question': {'box':[], 'text':[]},
+                    'date':     {'box':[], 'text':[]}}
 
         # preprocess image (~8s)
         # image = preprocess_image(image)
@@ -85,17 +83,25 @@ class TemplateCreater():
 
         form_name, position_of_form_name = self.text_extractor.extract_form_name(template['title'])
 
-        template['title']['box'] = position_of_form_name
+        template['title']['box'] = [position_of_form_name]
         template['title']['text'] = self.make_column_name([form_name])
 
         template['question']['box'] = question_boxes
         template['question']['text'] = self.make_column_name(question_texts)
 
         if len(form_result['date']['box']) > 0:
-            template['question']['box'].append(form_result['date']['box'][0])
-            template['question']['text'].append('ngay_tao_don')
+            template['date']['box'].append(form_result['date']['box'][0])
+            template['date']['text'].append('ngay_tao_don')
 
-        print(template)
+        template_json = []
+        for key_template, value_template in template.items():
+            for i, box in enumerate(value_template['box']):
+                element = {'box': box,
+                           'text': value_template['text'][i],
+                           'class': key_template}
+                template_json.append(element)
+
+        # print(template_json)
 
         form_img = None
         if is_visualize:
@@ -103,7 +109,7 @@ class TemplateCreater():
 
         self.text_extractor.reset_info()
         print(time.time() - start_time)
-        return template, status_code, [form_img]
+        return template_json, status_code, [image, form_img]
 
 
     def make_column_name(self, text_list):
@@ -120,6 +126,7 @@ class TemplateCreater():
             text_list[i] = '_'.join(ascii_words_in_text)
 
         return text_list
+
 
 if __name__ == "__main__":
 
