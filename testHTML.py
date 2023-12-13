@@ -28,7 +28,8 @@ creater = TemplateCreater()  # create an instance of the Singleton class
 
 @app.get("/")
 async def read_item(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    template = []
+    return templates.TemplateResponse("index.html", {"request": request, "imagePath": 'img/first_img.jpg', "jsonData": template})
 
 
 # input is image link
@@ -62,6 +63,6 @@ async def extracting(request: Request,
         with open('result/template.json', 'w', encoding='utf-8') as outfile:
             json.dump(template, outfile, ensure_ascii=False)
 
-    return templates.TemplateResponse("index.html", {"request": request, "imageName": '/img/temp_img.jpg', "jsonData": template})
+    return templates.TemplateResponse("index.html", {"request": request, "imagePath": 'img/temp_img.jpg', "jsonData": template})
 
 

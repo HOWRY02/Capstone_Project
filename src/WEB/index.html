@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Certificate Detection</title>
+  <title>Template Creater</title>
   <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
 </head>
+
 <body>
   <div class="container">
     <div class="left-column">
       <form action="/extracting" enctype="multipart/form-data" method="POST">
-        <input type="file" id="imageInput" name="imageInput" accept="image/*"/>
+        <input type="file" id="imageInput" name="imageInput" accept="image/*">
         <button id="submitButton" onclick="setMode('submit')">Submit</button>
       </form>
 
@@ -23,7 +25,7 @@
 
       <div class="image-container">
         <canvas id="imageCanvas"></canvas>
-        <img id="imageTemp" src="{{ url_for('static', path='/img/temp_img.jpg') }}" style="display: none;">
+        <img id="formImage" src="{{ url_for('static', path='/' + imagePath) }}" style="display: none;">
       </div>
     </div>
 
@@ -34,5 +36,7 @@
     </div>
   </div>
   <script src="{{ url_for('static', path='/script.js') }}"></script>
+  <!-- <script src="{{ url_for('static', path='/button_controler.js') }}"></script> -->
 </body>
+
 </html>

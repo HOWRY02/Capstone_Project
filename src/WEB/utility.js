@@ -1,64 +1,68 @@
-const mysql = require('mysql');
+function delareImage() {
+  if (isSubmiting) {
+    img.src = imgSrc;
+  } else {
+    img.src = realImgSrc;
+  }
 
-const connection = mysql.createConnection({
-  host: '192.168.1.3', // Replace with your actual host
-  user: 'admin', // Replace with your actual username
-  password: '123456', // Replace with your actual password
-  database: 'document_management' // Replace with your actual database name
-});
+  // Setting the canvas dimensions to match the loaded image
+  imageCanvas.width = img.width;
+  imageCanvas.height = img.height;
 
-// Define the table name and column definitions
-const tableName = 'my_table';
-const columns = {
-  id: {
-    type: 'int',
-    primary_key: true,
-    auto_increment: true
-  },
-  name: {
-    type: 'varchar(50)',
-    not_null: true
-  },
-  age: {
-    type: 'int'
-  }
-};
-
-// Generate the CREATE TABLE statement
-const createTableSql = `CREATE TABLE ${tableName} (`;
-for (const column in columns) {
-  createTableSql += `\n  ${column} ${columns[column].type}`;
-  if (columns[column].primary_key) {
-    createTableSql += ' PRIMARY KEY';
-  }
-  if (columns[column].auto_increment) {
-    createTableSql += ' AUTO_INCREMENT';
-  }
-  if (columns[column].not_null) {
-    createTableSql += ' NOT NULL';
-  }
-  createTableSql += ',';
+  adjustInputElementsSize(); // Call function to adjust input elements size
 }
-// Remove the trailing comma and add the closing parenthesis
-createTableSql = createTableSql.slice(0, -1) + ')';
 
-// Connect to the database
-connection.connect(err => {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  console.log('Connected to MySQL database');
+function draw() {
+  delareImage();
+  ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+  ctx.drawImage(img, 0, 0, img.width, img.height);
 
-  // Create the table
-  connection.query(createTableSql, err => {
-    if (err) {
-      console.error(err);
-      return;
+  boxes.forEach((box, index) => {
+    switch (box.class) {
+      case 'title':
+        ctx.strokeStyle = colorTitle;
+        ctx.strokeStyle = colorTitle; // Set red color for 'title' class
+        currentColor = colorTitle;
+        break;
+      case 'question':
+        ctx.strokeStyle = colorQuestion; // Set violet color for 'question' class
+        ctx.strokeStyle = colorQuestion;
+        currentColor = colorQuestion;
+        break;
+      case 'date':
+        ctx.strokeStyle = colorDate; // Set violet color for 'question' class
+        ctx.strokeStyle = colorDate;
+        currentColor = colorDate;
+        break;
+      default:
+        ctx.strokeStyle = currentColor; // Set default color if no specific class matches
+        break;
     }
-    console.log(`Table ${tableName} created successfully`);
+
+    ctx.strokeStyle = selectedBox === box ? 'blue' : currentColor;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(box.startX, box.startY, box.width, box.height);
+
+    // **Comment out the following code to remove the circle**
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(box.startX + box.width, box.startY + box.height, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    if (selectedBox === box) {
+      // Display text input for the selected box
+      const text = box.text || '';
+      const inputText = document.getElementById('textInput');
+      inputText.value = text;
+      inputText.style.display = 'block';
+      inputText.style.top = `${box.startY + box.height + 5}px`; // Adjust text input position
+      inputText.style.left = `${box.startX}px`; // Adjust text input position
+    }
   });
 
-  // Close the connection
-  connection.end();
-});
+  if (resizingBox !== null) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.fillRect(resizingBox.startX, resizingBox.startY, resizingBox.width, resizingBox.height);
+  }
+}
