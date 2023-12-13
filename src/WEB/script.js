@@ -1,20 +1,28 @@
-const imageInput = document.getElementById('imageInput');
 const imageCanvas = document.getElementById('imageCanvas');
 const ctx = imageCanvas.getContext('2d');
-// const imageInput = document.getElementById("hiddenImageName");
-// let boxes = document.getElementById("hiddenJsonData").textContent;
-// const jsonData = JSON.parse(document.getElementById("hiddenJsonData").textContent);
-// let img = document.getElementById("hiddenImageName").value;
-// console.log(img)
-// console.log(boxes)
+const imageTemp = document.getElementById("imageTemp");
+const imgSrc = imageTemp.src;
+const boxesString = document.getElementById("hiddenJsonData").textContent.replace(/'/g, '"');
+const boxesTemp = JSON.parse(boxesString);
+// Threshold for removing small boxes automatically
+const removeThreshold = 5;
 
-let img;
+let img = new Image();
 let isDragging = false; // Flag to track dragging action
 let mouseX, mouseY;
 let selectedBox = null;
 let boxes = []; // Array to store box coordinates
 let resizingBox = null; // Variable to track the box being resized
 let isResizing = false; // Flag to track resize status
+boxes = boxesTemp.map(data => ({
+  startX: data.box[2],
+  startY: data.box[3],
+  width: data.box[0] - data.box[2],
+  height: data.box[1] - data.box[3],
+  text: data.text || '', // Ensure text property exists or set it to an empty string
+  class: data.class
+}));
+
 
 // Variables to store the current mode
 let currentMode = 'title'; // Default mode is 'title'
@@ -22,8 +30,6 @@ let colorTitle = 'red';
 let colorQuestion = 'green';
 let colorDate = 'blue';
 let currentColor = colorTitle;
-// Threshold for removing small boxes automatically
-removeThreshold = 5;
 
 // Function to set the current mode
 function setMode(mode, color) {
@@ -37,8 +43,18 @@ function removeSmallBoxes() {
   draw(); // Redraw the canvas after removing small boxes
 }
 
+function delareImage() {
+  img.src = imgSrc;
+  // Setting the canvas dimensions to match the loaded image
+  imageCanvas.width = img.width;
+  imageCanvas.height = img.height;
+
+  adjustInputElementsSize(); // Call function to adjust input elements size
+}
+
 // Draw
 function draw() {
+  delareImage();
   // console.log(currentMode)
   ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
   ctx.drawImage(img, 0, 0, img.width, img.height);
@@ -168,41 +184,6 @@ function deleteAllBoxes() {
 //   }
 // });
 
-imageInput.addEventListener('change', function (event) {
-  // delete Allboxes if there are any 
-  deleteAllBoxes()
-  // Retrieving the selected file
-  const file = event.target.files[0];
-
-  // Checking if a file is selected
-  if (file) {
-    // Creating a new instance of FileReader
-    const reader = new FileReader();
-
-    // Event triggered when FileReader finishes reading the file
-    reader.onload = function (e) {
-      // Creating a new Image object
-      img = new Image();
-
-      // Event triggered when the image has finished loading
-      img.onload = function () {
-        // Setting the canvas dimensions to match the loaded image
-        imageCanvas.width = img.width;
-        imageCanvas.height = img.height;
-
-        adjustInputElementsSize(); // Call function to adjust input elements size
-        // Drawing the image on the canvas
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-      };
-
-      // Setting the source of the image to the result of FileReader
-      img.src = e.target.result;
-    };
-
-    // Reading the selected file as a data URL
-    reader.readAsDataURL(file);
-  }
-});
 
 function findHandle(x, y) {
   // Iterate through all the boxes in the 'boxes' array
@@ -524,22 +505,23 @@ const saveButton = document.getElementById('saveButton');
 saveButton.addEventListener('click', saveBoxes); // When the button is clicked, trigger the saveBoxes function
 
 // Select the buttons
-const titleModeBtn = document.getElementById('titleModeBtn');
-const questionModeBtn = document.getElementById('questionModeBtn');
-const dateModeBtn = document.getElementById('dateModeBtn');
+const titleButton = document.getElementById('titleButton');
+const questionButton = document.getElementById('questionButton');
+const dateButton = document.getElementById('dateButton');
+const submitButton = document.getElementById('submitButton');
 
 // Event listener for the 'Title Mode' button
-titleModeBtn.addEventListener('click', function () {
+titleButton.addEventListener('click', function () {
   setMode('title', colorTitle); // Set mode to 'title' with red color
 });
 
 // Event listener for the 'Question Mode' button
-questionModeBtn.addEventListener('click', function () {
+questionButton.addEventListener('click', function () {
   setMode('question', colorQuestion); // Set mode to 'question' with green color
 });
 
 // Event listener for the 'Question Mode' button
-dateModeBtn.addEventListener('click', function () {
+dateButton.addEventListener('click', function () {
   setMode('date', colorDate); // Set mode to 'date' with violet color
 });
 

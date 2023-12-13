@@ -40,6 +40,8 @@ async def extracting(request: Request,
 
     info = {}
     result = {}
+    template = []
+    image = imageInput.file
     if not extension:
         result = JSONResponse(status_code = 460, 
                 content = {"status_code": '460', 
@@ -54,9 +56,12 @@ async def extracting(request: Request,
                         "message": STATUS[status],
                         "result": template
                         })
+        
+        cv2.imwrite(f'src/WEB/img/temp_img.jpg', image)
 
         with open('result/template.json', 'w', encoding='utf-8') as outfile:
             json.dump(template, outfile, ensure_ascii=False)
 
-    return templates.TemplateResponse("index.html", {"request": request, "imageName": image, "jsonData": template})
+    return templates.TemplateResponse("index.html", {"request": request, "imageName": '/img/temp_img.jpg', "jsonData": template})
+
 
