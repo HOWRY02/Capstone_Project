@@ -102,6 +102,19 @@ body {
   background-color: #2980b9;
 }
 
+#createButton {
+  padding: 8px 15px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+/* Optional: You can add more styling to the button (hover effects, etc.) */
+#createButton:hover {
+  background-color: #2980b9;
+}
+
 /* Additional styling for input[type="file"] and #textInput */
 input[type="file"],
 #textInput {

@@ -1,3 +1,5 @@
+// import { adjustInputElementsSize, draw, removeSmallBoxes, deleteAllBoxes, findHandle, findBox, setMode, saveBoxes, loadBoxes } from 'src/WEB/script/utility.js';
+
 const imageInput = document.getElementById('imageInput');
 const imageCanvas = document.getElementById('imageCanvas');
 const ctx = imageCanvas.getContext('2d');
@@ -6,6 +8,14 @@ const imgSrc = formImage.src;
 const boxesString = document.getElementById("hiddenJsonData").textContent.replace(/'/g, '"');
 const boxesTemp = JSON.parse(boxesString);
 const removeThreshold = 5;
+
+const loadInput = document.getElementById('loadInput');
+const saveButton = document.getElementById('saveButton');
+const titleButton = document.getElementById('titleButton');
+const questionButton = document.getElementById('questionButton');
+const dateButton = document.getElementById('dateButton');
+const submitButton = document.getElementById('submitButton');
+const textInput = document.getElementById('textInput');
 
 let img = new Image();
 let realImgSrc;
@@ -16,6 +26,13 @@ let selectedBox = null;
 let boxes = []; // Array to store box coordinates
 let resizingBox = null; // Variable to track the box being resized
 let isResizing = false; // Flag to track resize status
+
+// Variables to store the current mode
+let currentMode = 'title'; // Default mode is 'title'
+let colorTitle = 'red';
+let colorQuestion = 'green';
+let colorDate = 'blue';
+let currentColor = colorTitle;
 
 tempImg = new Image();
 tempImg.onload = function () {
@@ -37,51 +54,6 @@ boxes = boxesTemp.map(data => ({
   text: data.text || '', // Ensure text property exists or set it to an empty string
   class: data.class
 }));
-
-// Function to remove boxes with absolute height or width < 0.5
-function removeSmallBoxes() {
-  boxes = boxes.filter(box => Math.abs(box.width) >= removeThreshold && Math.abs(box.height) >= removeThreshold);
-  draw();
-}
-
-
-
-// Function to adjust the size of input elements based on imageCanvas size
-function adjustInputElementsSize() {
-  const canvasRect = imageCanvas.getBoundingClientRect();
-  const canvasWidth = canvasRect.width;
-  const canvasHeight = canvasRect.height;
-
-  // Calculate the scaled size for input elements
-  const scaleFactor = Math.min(canvasWidth, canvasHeight) / 400; // Adjust according to your requirements
-
-  const inputText = document.getElementById('textInput');
-  inputText.style.fontSize = `${scaleFactor * 16}px`; // Adjust font size based on canvas size
-
-  const buttons = document.querySelectorAll('input[type="file"], #saveButton');
-  buttons.forEach(button => {
-    button.style.fontSize = `${scaleFactor * 14}px`; // Adjust button font size
-    button.style.padding = `${scaleFactor * 8}px ${scaleFactor * 16}px`; // Adjust button padding
-  });
-
-  // Adjust padding for question and title buttonz
-  const button_class = document.querySelectorAll('#submitButton, #questionButton, #titleButton, #dateButton');
-  button_class.forEach(button => {
-    button.style.fontSize = `${scaleFactor * 12}px`; // Adjust button font size
-    button.style.padding = `${scaleFactor * 6}px ${scaleFactor * 13}px`; // Adjust button padding
-  });
-}
-
-// Call the function to delete all boxes
-function deleteAllBoxes() {
-  // Check if there are boxes in the array
-  if (boxes.length > 0) {
-    // Remove all boxes from the array
-    boxes.splice(0, boxes.length);
-    selectedBox = null; // Clear the selectedBox reference
-    draw();
-  }
-}
 
 // Adding an event listener to 'imageInput' element when a file is selected
 imageInput.addEventListener('change', function (event) {
@@ -121,67 +93,6 @@ imageInput.addEventListener('change', function (event) {
     isSubmiting = false;
   }
 });
-
-
-function findHandle(x, y) {
-  // Iterate through all the boxes in the 'boxes' array
-  for (let i = 0; i < boxes.length; i++) {
-    const box = boxes[i]; // Get the current box
-
-    let topLeftX, topLeftY, bottomRightX, bottomRightY;
-
-    // Determine coordinates of the top-left and bottom-right corners of the box
-    if (box.width > 0 && box.height > 0) {
-      topLeftX = box.startX;
-      topLeftY = box.startY;
-      bottomRightX = box.startX + box.width;
-      bottomRightY = box.startY + box.height;
-    } else if (box.width > 0 && box.height < 0) {
-      topLeftX = box.startX;
-      topLeftY = box.startY + box.height;
-      bottomRightX = box.startX + box.width;
-      bottomRightY = box.startY;
-    } else if (box.width < 0 && box.height < 0) {
-      topLeftX = box.startX + box.width;
-      topLeftY = box.startY + box.height;
-      bottomRightX = box.startX;
-      bottomRightY = box.startY;
-    } else {
-      topLeftX = box.startX + box.width;
-      topLeftY = box.startY;
-      bottomRightX = box.startX;
-      bottomRightY = box.startY + box.height;
-    }
-
-    // Calculate the center of the box
-    const centerX = bottomRightX;
-    const centerY = bottomRightY;
-
-    // Calculate the distance between the mouse pointer and the center of the box
-    const distX = x - centerX;
-    const distY = y - centerY;
-    const distance = Math.sqrt(distX * distX + distY * distY);
-
-    // If the distance is within a threshold (6 in this case), consider it a resize handle
-    if (distance <= 6) {
-      return { type: 'resize', boxIndex: i }; // Return resize handle type and box index
-    }
-
-    // Check if the mouse pointer is inside the bounding box of the current box
-    if (
-      x >= Math.min(topLeftX, bottomRightX) &&
-      x <= Math.max(topLeftX, bottomRightX) &&
-      y >= Math.min(topLeftY, bottomRightY) &&
-      y <= Math.max(topLeftY, bottomRightY)
-    ) {
-      return { type: 'drag', boxIndex: i }; // Return drag type and box index
-    }
-  }
-
-  // If no box or handle is found under the mouse pointer, return type 'none' and box index -1
-  return { type: 'none', boxIndex: -1 };
-}
-
 
 // Adding a mousedown event listener to the imageCanvas
 imageCanvas.addEventListener('mousedown', (e) => {
@@ -264,52 +175,15 @@ imageCanvas.addEventListener('mouseup', () => {
     resizingBox = null;
 
     // Update text for the selected box if it exists and the input text is not empty
-    const inputText = document.getElementById('textInput');
-    if (selectedBox !== null && inputText.value.trim() !== '') {
-      selectedBox.text = inputText.value.trim();
-      inputText.style.display = 'none'; // Hide text input after saving text
+    const textInput = document.getElementById('textInput');
+    if (selectedBox !== null && textInput.value.trim() !== '') {
+      selectedBox.text = textInput.value.trim();
+      textInput.style.display = 'none'; // Hide text input after saving text
     }
     draw();
   }
   removeSmallBoxes() // Remove small boxes after the mouse is released
 });
-
-// Function to handle keydown events
-document.addEventListener('keydown', (e) => {
-  // Check if the pressed key is 'Delete'
-  if (e.key === 'Delete') {
-    // Check if a box is currently selected
-    if (selectedBox !== null) {
-      // Find the index of the selected box in the boxes array
-      const index = boxes.indexOf(selectedBox);
-      // If the selected box is found in the array
-      if (index !== -1) {
-        // Remove the selected box from the boxes array
-        boxes.splice(index, 1);
-        selectedBox = null; // Clear the selectedBox reference
-        draw();
-      }
-    }
-  }
-});
-
-// Function to find a box based on the coordinates (x, y)
-function findBox(x, y) {
-  // Loop through the boxes array
-  for (let i = 0; i < boxes.length; i++) {
-    const box = boxes[i];
-    // Check if the coordinates (x, y) fall within the boundaries of the current box
-    if (
-      x >= box.startX &&
-      x <= box.startX + box.width &&
-      y >= box.startY &&
-      y <= box.startY + box.height
-    ) {
-      return i; // Return the index of the box if found
-    }
-  }
-  return -1; // Return -1 if no box is found at the given coordinates
-}
 
 // Function to handle the contextmenu event on the imageCanvas
 imageCanvas.addEventListener('contextmenu', (e) => {
@@ -331,3 +205,133 @@ imageCanvas.addEventListener('contextmenu', (e) => {
   }
 });
 
+// Function to handle keydown events
+document.addEventListener('keydown', (e) => {
+  // Check if the pressed key is 'Delete'
+  if (e.key === 'Delete') {
+    // Check if a box is currently selected
+    if (selectedBox !== null) {
+      // Find the index of the selected box in the boxes array
+      const index = boxes.indexOf(selectedBox);
+      // If the selected box is found in the array
+      if (index !== -1) {
+        // Remove the selected box from the boxes array
+        boxes.splice(index, 1);
+        selectedBox = null; // Clear the selectedBox reference
+        draw();
+      }
+    }
+  }
+});
+
+// Function to load boxes data from a JSON file
+function loadBoxes(event) {
+  const file = event.target.files[0]; // Get the selected file
+
+  if (file) {
+    const reader = new FileReader(); // Create a FileReader object
+
+    reader.onload = function (e) {
+      const loadedData = JSON.parse(e.target.result); // Parse loaded JSON data
+
+      // Load boxes with their associated text from the loaded data
+      boxes = loadedData.map(data => ({
+        startX: data.box[2],
+        startY: data.box[3],
+        width: data.box[0] - data.box[2],
+        height: data.box[1] - data.box[3],
+        text: data.text || '', // Ensure text property exists or set it to an empty string
+        class: data.class
+      }));
+      draw();
+    };
+    reader.readAsText(file); // Read the contents of the file as text
+  }
+}
+
+// Function to save boxes to a JSON file
+function saveBoxes() {
+  const boxesToSave = boxes.map(box => {
+
+    let topLeftX, topLeftY, bottomRightX, bottomRightY;
+
+    if (box.width > 0 && box.height > 0) {
+      topLeftX = box.startX;
+      topLeftY = box.startY;
+      bottomRightX = box.startX + box.width;
+      bottomRightY = box.startY + box.height;
+    } else if (box.width > 0 && box.height < 0) {
+      topLeftX = box.startX;
+      topLeftY = box.startY + box.height;
+      bottomRightX = box.startX + box.width;
+      bottomRightY = box.startY;
+    } else if (box.width < 0 && box.height < 0) {
+      topLeftX = box.startX + box.width;
+      topLeftY = box.startY + box.height;
+      bottomRightX = box.startX;
+      bottomRightY = box.startY;
+    } else {
+      topLeftX = box.startX + box.width;
+      topLeftY = box.startY;
+      bottomRightX = box.startX;
+      bottomRightY = box.startY + box.height;
+    }
+
+    return { box: [topLeftX, topLeftY, bottomRightX, bottomRightY], text: box.text, class: box.class }
+  });
+
+  // Convert boxes data to JSON string
+  const dataToSave = JSON.stringify(boxesToSave);
+
+  // Create a Blob (Binary Large Object) containing the JSON data
+  const blob = new Blob([dataToSave], { type: 'application/json' });
+
+  // Create a URL for the Blob
+  const url = URL.createObjectURL(blob);
+
+  // Create an anchor element to trigger the file download
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'boxes.json'; // Set the filename for downloaded file
+  document.body.appendChild(a);
+  a.click(); // Simulate a click on the anchor element to initiate download
+  document.body.removeChild(a); // Remove the anchor element
+  URL.revokeObjectURL(url); // Revoke the object URL to free up resources
+}
+
+// Event listener for input element to load JSON file
+loadInput.addEventListener('change', loadBoxes); // When the file input changes, trigger the loadBoxes function
+
+// Event listener for saving boxes when a button is clicked
+saveButton.addEventListener('click', saveBoxes); // When the button is clicked, trigger the saveBoxes function
+
+// Event listener for the 'Title Mode' button
+titleButton.addEventListener('click', function () {
+  setMode('title', colorTitle); // Set mode to 'title' with red color
+});
+
+// Event listener for the 'Question Mode' button
+questionButton.addEventListener('click', function () {
+  setMode('question', colorQuestion); // Set mode to 'question' with green color
+});
+
+// Event listener for the 'Question Mode' button
+dateButton.addEventListener('click', function () {
+  setMode('date', colorDate); // Set mode to 'date' with violet color
+});
+
+// Event listener for the text input field to update box text on pressing Enter
+textInput.addEventListener('keypress', function (e) {
+  // Check if the 'Enter' key is pressed
+  if (e.key === 'Enter') {
+    // Check if a box is selected and the input text is not empty
+    if (selectedBox !== null && textInput.value.trim() !== '') {
+      selectedBox.text = textInput.value.trim(); // Update the selected box text
+      textInput.style.display = 'none'; // Hide text input after saving text
+      draw();
+    }
+  }
+});
+
+document.getElementById('variableValue').textContent = JSON.stringify(boxes);
+console.log(boxes)

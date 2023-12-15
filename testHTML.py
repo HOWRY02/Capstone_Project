@@ -29,7 +29,7 @@ creater = TemplateCreater()  # create an instance of the Singleton class
 @app.get("/")
 async def read_item(request: Request):
     template = []
-    return templates.TemplateResponse("index.html", {"request": request, "imagePath": 'img/first_img.jpg', "jsonData": template})
+    return templates.TemplateResponse("index.html", {"request": request, "imagePath": 'img/init_img.jpg', "jsonData": template})
 
 
 # input is image link
