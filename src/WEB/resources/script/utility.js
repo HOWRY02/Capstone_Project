@@ -10,6 +10,9 @@ function adjustInputElementsSize() {
   const inputText = document.getElementById('textInput');
   inputText.style.fontSize = `${scaleFactor * 16}px`; // Adjust font size based on canvas size
 
+  const templateDisplay = document.getElementById('templateDisplay');
+  templateDisplay.style.fontSize = `${scaleFactor * 10}px`; // Adjust font size based on canvas size
+
   const buttons = document.querySelectorAll('input[type="file"], #saveButton, #createButton');
   buttons.forEach(button => {
     button.style.fontSize = `${scaleFactor * 14}px`; // Adjust button font size
@@ -91,6 +94,8 @@ function draw() {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
     ctx.fillRect(resizingBox.startX, resizingBox.startY, resizingBox.width, resizingBox.height);
   }
+  const boxesToSave = formatBoxesToSave(boxes);
+  document.getElementById('templateDisplay').textContent = JSON.stringify(boxesToSave);
 }
 
 // Function to remove boxes with absolute height or width < 0.5
@@ -192,6 +197,38 @@ function setMode(mode, color) {
   currentMode = mode;
   currentColor = color
   draw();
+}
+
+function formatBoxesToSave(boxes) {
+  const boxesToSave = boxes.map(box => {
+
+    let topLeftX, topLeftY, bottomRightX, bottomRightY;
+  
+    if (box.width > 0 && box.height > 0) {
+      topLeftX = box.startX;
+      topLeftY = box.startY;
+      bottomRightX = box.startX + box.width;
+      bottomRightY = box.startY + box.height;
+    } else if (box.width > 0 && box.height < 0) {
+      topLeftX = box.startX;
+      topLeftY = box.startY + box.height;
+      bottomRightX = box.startX + box.width;
+      bottomRightY = box.startY;
+    } else if (box.width < 0 && box.height < 0) {
+      topLeftX = box.startX + box.width;
+      topLeftY = box.startY + box.height;
+      bottomRightX = box.startX;
+      bottomRightY = box.startY;
+    } else {
+      topLeftX = box.startX + box.width;
+      topLeftY = box.startY;
+      bottomRightX = box.startX;
+      bottomRightY = box.startY + box.height;
+    }
+  
+    return { box: [topLeftX, topLeftY, bottomRightX, bottomRightY], text: box.text, class: box.class }
+  });
+  return boxesToSave;
 }
 
 // // Function to save boxes to a JSON file

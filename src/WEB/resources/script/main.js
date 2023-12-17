@@ -251,34 +251,8 @@ function loadBoxes(event) {
 
 // Function to save boxes to a JSON file
 function saveBoxes() {
-  const boxesToSave = boxes.map(box => {
 
-    let topLeftX, topLeftY, bottomRightX, bottomRightY;
-
-    if (box.width > 0 && box.height > 0) {
-      topLeftX = box.startX;
-      topLeftY = box.startY;
-      bottomRightX = box.startX + box.width;
-      bottomRightY = box.startY + box.height;
-    } else if (box.width > 0 && box.height < 0) {
-      topLeftX = box.startX;
-      topLeftY = box.startY + box.height;
-      bottomRightX = box.startX + box.width;
-      bottomRightY = box.startY;
-    } else if (box.width < 0 && box.height < 0) {
-      topLeftX = box.startX + box.width;
-      topLeftY = box.startY + box.height;
-      bottomRightX = box.startX;
-      bottomRightY = box.startY;
-    } else {
-      topLeftX = box.startX + box.width;
-      topLeftY = box.startY;
-      bottomRightX = box.startX;
-      bottomRightY = box.startY + box.height;
-    }
-
-    return { box: [topLeftX, topLeftY, bottomRightX, bottomRightY], text: box.text, class: box.class }
-  });
+  const boxesToSave = formatBoxesToSave(boxes);
 
   // Convert boxes data to JSON string
   const dataToSave = JSON.stringify(boxesToSave);
@@ -333,5 +307,3 @@ textInput.addEventListener('keypress', function (e) {
   }
 });
 
-document.getElementById('variableValue').textContent = JSON.stringify(boxes);
-console.log(boxes)
