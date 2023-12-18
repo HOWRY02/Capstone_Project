@@ -14,6 +14,7 @@ const questionButton = document.getElementById('questionButton');
 const dateButton = document.getElementById('dateButton');
 const submitButton = document.getElementById('submitButton');
 const textInput = document.getElementById('textInput');
+const createButton = document.getElementById('createButton');
 
 let img = new Image();
 let realImgSrc;
@@ -257,6 +258,52 @@ textInput.addEventListener('keypress', function (e) {
       textInput.style.display = 'none'; // Hide text input after saving text
       draw();
     }
+  }
+});
+
+createButton.addEventListener('click', async () => {
+  const jsonData = document.getElementById('templateDisplay').textContent;
+  const tableToCreate = JSON.parse(jsonData).filter(item => item.class === "title").map(item => item.text);
+
+  const response = await fetch(`/confirm_and_create_table?table_name=${tableToCreate}`, {
+    method: 'POST'
+  });
+
+  const data = await response.json();
+
+  if (data.tableExists) {
+    const confirmation = confirm(`Table "${tableToCreate}" already exists. Do you want to proceed with creating the table?`);
+    if (confirmation) {
+
+      fetch('/create_table_proceed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data: jsonData })
+      })
+        .then(response => response.json())
+        // .then(data => console.log('Response from FastAPI:', data))
+        // .catch(error => console.error('Error creating table:', error));
+        .then(data => alert(data.message))
+        .catch(error => alert(error.message));
+
+    } else {
+      console.log('Table creation cancelled.');
+    }
+  } else {
+    fetch('/create_table_proceed', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ data: jsonData })
+    })
+      .then(response => response.json())
+      // .then(data => console.log('Response from FastAPI:', data))
+      // .catch(error => console.error('Error creating table:', error));
+      .then(data => alert(data.message))
+      .catch(error => alert(error.message));
   }
 });
 

@@ -3,7 +3,7 @@ import yaml
 import json
 import mysql.connector
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends, File, UploadFile, Form, Request
+from fastapi import FastAPI, Depends, File, UploadFile, Form, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from src.template_creater import TemplateCreater
@@ -20,16 +20,29 @@ templates = Jinja2Templates(directory="src/WEB/resources/views")
 
 creater = TemplateCreater()  # create an instance of the Singleton class
 
+is_visualize = True
+
 # MySQL connection
-db = mysql.connector.connect(
-    host="localhost",
-    user="admin",
-    password="123456",
-    database="document_management"
-)
+# db = mysql.connector.connect(
+#     host="localhost",
+#     user="admin",
+#     password="123456",
+#     database="document_management"
+# )
+
+db_config = {
+    'host': 'localhost',
+    'user': 'admin',
+    'password': '123456',
+    'database': 'document_management'
+}
 
 class JSONData(BaseModel):
     data: str
+
+class CreateRequest(BaseModel):
+    data: str  # Change the type based on the structure of your JSON data
+    # table_name: str
 
 @app.get("/")
 async def root(request: Request):
@@ -53,27 +66,17 @@ async def creatingTable(request: Request,
                         imageInput: UploadFile = File()):
 
     img = load_image(imageInput.file)
-    template, status, [image, form_img] = creater.create(img, False)
+    template, status, [image, form_img] = creater.create(img, is_visualize)
 
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', image)
 
     with open('result/template.json', 'w', encoding='utf-8') as outfile:
         json.dump(template, outfile, ensure_ascii=False)
 
+    if is_visualize:
+        cv2.imwrite(f'result/form_img.jpg', form_img)
+
     return templates.TemplateResponse("create_table.html", {"request": request, "imagePath": 'public/img/temp_img.jpg', "jsonData": template})
-
-
-@app.post("/create")
-async def create(data: JSONData):
-    try:
-        # cursor = db.cursor()
-        # cursor.execute(f"CREATE TABLE IF NOT EXISTS new_table ({data.data})")
-        # db.commit()
-        data_dict = json.loads(data.data)
-        print(data_dict)
-        return {"message": "Table created successfully"}
-    except Exception as e:
-        return {"message": f"Error creating table: {str(e)}"}
 
 
 @app.post("/extractingInfo/rec")
@@ -82,3 +85,62 @@ async def extractingInfo(request: Request,
     
     return templates.TemplateResponse("extract_info.html", {"request": request})
 
+
+def check_table_exists(table_name):
+    try:
+        db = mysql.connector.connect(**db_config)
+        cursor = db.cursor()
+        cursor.execute(f"SHOW TABLES LIKE '{table_name}'")
+        result = cursor.fetchone()
+        cursor.close()
+        db.close()
+        return result is not None
+    except Exception as e:
+        print(f"Error checking table existence: {str(e)}")
+        return False
+
+
+@app.post("/create_table")
+async def create_table_action(table_name: str):
+    table_exists = check_table_exists(table_name)
+    if table_exists:
+        return {"message": f"Table '{table_name}' already exists."}
+    else:
+        return {"message": f"Table '{table_name}' does not exist."}
+
+
+@app.post("/confirm_and_create_table")
+async def confirm_and_create_table(table_name: str):
+    table_exists = check_table_exists(table_name)
+    if table_exists:
+        # If table exists, prompt user for confirmation
+        return {"tableExists": True}
+    else:
+        return {"tableExists": False}
+
+
+@app.post("/create_table_proceed")
+async def create_table_proceed(data: JSONData):
+    try:
+        data_dict = json.loads(data.data)
+        for box in data_dict:
+            if box['class'] == 'title':
+                table_name = box['text']
+                break
+            
+        db = mysql.connector.connect(**db_config)
+        cursor = db.cursor()
+        # Drop table if it exists
+        cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
+        # Replace with your table creation SQL statement
+        cursor.execute(f"CREATE TABLE {table_name} (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255));")
+        db.commit()
+        cursor.close()
+        db.close()
+
+        with open(f"config/template_form/{table_name}.json", 'w', encoding='utf-8') as outfile:
+            json.dump(data_dict, outfile, ensure_ascii=True)
+
+        return {"message": f"Table '{table_name}' created successfully."}
+    except Exception as e:
+        return {"message": f"Error creating table: {str(e)}."}

@@ -231,22 +231,6 @@ function formatBoxesToSave(boxes) {
   return boxesToSave;
 }
 
-function createTable() {
-  const jsonData = document.getElementById('templateDisplay').textContent;
-  fetch('/create', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ data: jsonData })
-  })
-    .then(response => response.json())
-    // .then(data => console.log('Response from FastAPI:', data))
-    // .catch(error => console.error('Error creating table:', error));
-    .then(data => alert(data.message))
-    .catch(error => alert(error.message));
-}
-
 // Function to load boxes data from a JSON file
 function loadBoxes(event) {
   const file = event.target.files[0]; // Get the selected file
