@@ -279,3 +279,16 @@ function saveBoxes(boxes) {
   document.body.removeChild(a); // Remove the anchor element
   URL.revokeObjectURL(url); // Revoke the object URL to free up resources
 }
+
+function createTable(jsonData) {
+  fetch('/create_table_proceed', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ data: jsonData })
+  })
+    .then(response => response.json())
+    .then(data => alert(data.message))
+    .catch(error => alert(error.message));
+}

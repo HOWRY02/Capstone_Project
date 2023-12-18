@@ -22,14 +22,7 @@ creater = TemplateCreater()  # create an instance of the Singleton class
 
 is_visualize = True
 
-# MySQL connection
-# db = mysql.connector.connect(
-#     host="localhost",
-#     user="admin",
-#     password="123456",
-#     database="document_management"
-# )
-
+# MySQL config
 db_config = {
     'host': 'localhost',
     'user': 'admin',
@@ -39,10 +32,6 @@ db_config = {
 
 class JSONData(BaseModel):
     data: str
-
-class CreateRequest(BaseModel):
-    data: str  # Change the type based on the structure of your JSON data
-    # table_name: str
 
 @app.get("/")
 async def root(request: Request):
@@ -98,15 +87,6 @@ def check_table_exists(table_name):
     except Exception as e:
         print(f"Error checking table existence: {str(e)}")
         return False
-
-
-@app.post("/create_table")
-async def create_table_action(table_name: str):
-    table_exists = check_table_exists(table_name)
-    if table_exists:
-        return {"message": f"Table '{table_name}' already exists."}
-    else:
-        return {"message": f"Table '{table_name}' does not exist."}
 
 
 @app.post("/confirm_and_create_table")
