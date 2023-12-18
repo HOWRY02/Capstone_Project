@@ -24,7 +24,7 @@ class FormUnderstand():
             raise Exception('Text Recognizer is a singleton!')
         else:
             FormUnderstand.__instance__ = self
-            self.model = YOLO('model/doc_model/yolov8_instance_segmentation/document_understanding/v2/best.pt')
+            self.model = YOLO('model/doc_model/yolov8_instance_segmentation/document_understanding/v1/best.pt')
 
 
     def format_form_result(self, form_result):
@@ -49,7 +49,7 @@ class FormUnderstand():
     def predict(self, image, conf=0.4):
         
         new_image = image.copy()
-        form_result = self.format_form_result(self.model.predict(new_image, conf=conf))
+        form_result = self.format_form_result(self.model.predict(new_image, conf=conf, verbose=False))
 
         for key_form, value_form in form_result.items():
             value_form['box'].sort(key = lambda x: x[1])

@@ -1,5 +1,3 @@
-// import { adjustInputElementsSize, draw, removeSmallBoxes, deleteAllBoxes, findHandle, findBox, setMode, saveBoxes, loadBoxes } from 'src/WEB/script/utility.js';
-
 const imageInput = document.getElementById('imageInput');
 const imageCanvas = document.getElementById('imageCanvas');
 const ctx = imageCanvas.getContext('2d');
@@ -224,60 +222,15 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Function to load boxes data from a JSON file
-function loadBoxes(event) {
-  const file = event.target.files[0]; // Get the selected file
-
-  if (file) {
-    const reader = new FileReader(); // Create a FileReader object
-
-    reader.onload = function (e) {
-      const loadedData = JSON.parse(e.target.result); // Parse loaded JSON data
-
-      // Load boxes with their associated text from the loaded data
-      boxes = loadedData.map(data => ({
-        startX: data.box[2],
-        startY: data.box[3],
-        width: data.box[0] - data.box[2],
-        height: data.box[1] - data.box[3],
-        text: data.text || '', // Ensure text property exists or set it to an empty string
-        class: data.class
-      }));
-      draw();
-    };
-    reader.readAsText(file); // Read the contents of the file as text
-  }
-}
-
-// Function to save boxes to a JSON file
-function saveBoxes() {
-
-  const boxesToSave = formatBoxesToSave(boxes);
-
-  // Convert boxes data to JSON string
-  const dataToSave = JSON.stringify(boxesToSave);
-
-  // Create a Blob (Binary Large Object) containing the JSON data
-  const blob = new Blob([dataToSave], { type: 'application/json' });
-
-  // Create a URL for the Blob
-  const url = URL.createObjectURL(blob);
-
-  // Create an anchor element to trigger the file download
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'boxes.json'; // Set the filename for downloaded file
-  document.body.appendChild(a);
-  a.click(); // Simulate a click on the anchor element to initiate download
-  document.body.removeChild(a); // Remove the anchor element
-  URL.revokeObjectURL(url); // Revoke the object URL to free up resources
-}
-
 // Event listener for input element to load JSON file
-loadInput.addEventListener('change', loadBoxes); // When the file input changes, trigger the loadBoxes function
+loadInput.addEventListener('change', function (e) {
+  loadBoxes(e); // When the file input changes, trigger the loadBoxes function
+});
 
 // Event listener for saving boxes when a button is clicked
-saveButton.addEventListener('click', saveBoxes); // When the button is clicked, trigger the saveBoxes function
+saveButton.addEventListener('click', function () {
+  saveBoxes(boxes); // When the button is clicked, trigger the saveBoxes function
+});
 
 // Event listener for the 'Title Mode' button
 titleButton.addEventListener('click', function () {
