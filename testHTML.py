@@ -103,17 +103,22 @@ async def confirm_and_create_table(table_name: str):
 async def create_table_proceed(data: JSONData):
     try:
         data_dict = json.loads(data.data)
-        for box in data_dict:
-            if box['class'] == 'title':
-                table_name = box['text']
-                break
-            
+        data_dict.sort(key = lambda x: (x['box'][1], x['box'][0]))
+
+        # Filter JSON data for items where class is "text"
+        text_columns = [item['text'] for item in data_dict if item['class'] != 'title']
+        table_name = [item['text'] for item in data_dict if item['class'] == 'title'][0]
+
+        # Generate MySQL table creation query
+        columns = ', '.join(f"{col} VARCHAR(255)" for col in text_columns)
+        query = f"CREATE TABLE {table_name} (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, {columns});"
+
         db = mysql.connector.connect(**db_config)
         cursor = db.cursor()
         # Drop table if it exists
         cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
         # Replace with your table creation SQL statement
-        cursor.execute(f"CREATE TABLE {table_name} (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255));")
+        cursor.execute(query)
         db.commit()
         cursor.close()
         db.close()

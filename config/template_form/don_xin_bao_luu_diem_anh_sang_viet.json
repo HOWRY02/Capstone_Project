@@ -1,0 +1,162 @@
+[
+    {
+        "box": [
+            571,
+            280,
+            1088,
+            332
+        ],
+        "text": "don_xin_bao_luu_diem_anh_sang_viet",
+        "class": "title"
+    },
+    {
+        "box": [
+            188,
+            412,
+            435,
+            456
+        ],
+        "text": "ho_ten",
+        "class": "question"
+    },
+    {
+        "box": [
+            924,
+            412,
+            1095,
+            456
+        ],
+        "text": "dien_thoai",
+        "class": "question"
+    },
+    {
+        "box": [
+            188,
+            473,
+            423,
+            519
+        ],
+        "text": "mssv",
+        "class": "question"
+    },
+    {
+        "box": [
+            641,
+            473,
+            723,
+            521
+        ],
+        "text": "lop",
+        "class": "question"
+    },
+    {
+        "box": [
+            932,
+            473,
+            1027,
+            519
+        ],
+        "text": "khoa",
+        "class": "question"
+    },
+    {
+        "box": [
+            185,
+            535,
+            405,
+            581
+        ],
+        "text": "lop_cu_da_hoc",
+        "class": "question"
+    },
+    {
+        "box": [
+            929,
+            535,
+            1170,
+            579
+        ],
+        "text": "ma_sinh_vien_cu",
+        "class": "question"
+    },
+    {
+        "box": [
+            256,
+            654,
+            477,
+            742
+        ],
+        "text": "ten_mon_hoc_cu",
+        "class": "question"
+    },
+    {
+        "box": [
+            478,
+            654,
+            678,
+            742
+        ],
+        "text": "ma_mon_hoc_cu",
+        "class": "question"
+    },
+    {
+        "box": [
+            677,
+            654,
+            755,
+            771
+        ],
+        "text": "so_tin_chi_cu",
+        "class": "question"
+    },
+    {
+        "box": [
+            754,
+            654,
+            848,
+            705
+        ],
+        "text": "diem",
+        "class": "question"
+    },
+    {
+        "box": [
+            847,
+            654,
+            1064,
+            742
+        ],
+        "text": "ten_mon_hoc_dang_hoc",
+        "class": "question"
+    },
+    {
+        "box": [
+            1064,
+            654,
+            1262,
+            744
+        ],
+        "text": "ma_mon_hoc_dang_hoc",
+        "class": "question"
+    },
+    {
+        "box": [
+            1262,
+            654,
+            1336,
+            773
+        ],
+        "text": "so_tin_chi_dang_hoc",
+        "class": "question"
+    },
+    {
+        "box": [
+            820,
+            1953,
+            1456,
+            2001
+        ],
+        "text": "ngay_tao_don",
+        "class": "date"
+    }
+]

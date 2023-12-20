@@ -243,10 +243,10 @@ function loadBoxes(event) {
 
       // Load boxes with their associated text from the loaded data
       boxes = loadedData.map(data => ({
-        startX: data.box[2],
-        startY: data.box[3],
-        width: data.box[0] - data.box[2],
-        height: data.box[1] - data.box[3],
+        startX: Math.round(data.box[2]),
+        startY: Math.round(data.box[3]),
+        width: Math.round(data.box[0] - data.box[2]),
+        height: Math.round(data.box[1] - data.box[3]),
         text: data.text || '', // Ensure text property exists or set it to an empty string
         class: data.class
       }));

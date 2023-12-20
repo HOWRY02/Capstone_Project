@@ -125,7 +125,8 @@ imageCanvas.addEventListener('mousedown', (e) => {
       // If a new box creation action is detected
       isDragging = true;
       // Creating a new box at the clicked position with initial dimensions
-      const box = { startX: mouseX, startY: mouseY, width: 0, height: 0, class: currentMode };
+      const box = { startX: Math.round(mouseX), startY: Math.round(mouseY),
+                    width: 0, height: 0, class: currentMode };
       boxes.push(box); // Adding the new box to the boxes array
       selectedBox = box; // Setting the newly created box as selected
     }
@@ -151,15 +152,15 @@ imageCanvas.addEventListener('mousemove', (e) => {
       const dy = mouseY - selectedBox.startY;
 
       // Updating box position and dimensions based on mouse movement
-      selectedBox.startX = mouseX;
-      selectedBox.startY = mouseY;
-      selectedBox.width -= dx;
-      selectedBox.height -= dy;
+      selectedBox.startX = Math.round(mouseX);
+      selectedBox.startY = Math.round(mouseY);
+      selectedBox.width -= Math.round(dx);
+      selectedBox.height -= Math.round(dy);
     } else if (isResizing && resizingBox !== null) {
       // If resizing a box
       // Calculating and updating the resized box dimensions based on mouse movement
-      resizingBox.width = Math.max(0, mouseX - resizingBox.startX);
-      resizingBox.height = Math.max(0, mouseY - resizingBox.startY);
+      resizingBox.width = Math.round(Math.max(0, mouseX - resizingBox.startX));
+      resizingBox.height = Math.round(Math.max(0, mouseY - resizingBox.startY));
     }
     draw();
   }

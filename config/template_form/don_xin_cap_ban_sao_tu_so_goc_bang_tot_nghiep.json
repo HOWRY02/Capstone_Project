@@ -1,0 +1,162 @@
+[
+    {
+        "box": [
+            269,
+            345,
+            1496,
+            407
+        ],
+        "text": "don_xin_cap_ban_sao_tu_so_goc_bang_tot_nghiep",
+        "class": "title"
+    },
+    {
+        "box": [
+            310,
+            658,
+            449,
+            703
+        ],
+        "text": "ho_ten",
+        "class": "question"
+    },
+    {
+        "box": [
+            306,
+            727,
+            490,
+            774
+        ],
+        "text": "sinh_ngay",
+        "class": "question"
+    },
+    {
+        "box": [
+            825,
+            727,
+            901,
+            773
+        ],
+        "text": "tai",
+        "class": "question"
+    },
+    {
+        "box": [
+            308,
+            795,
+            501,
+            839
+        ],
+        "text": "nganh_hoc",
+        "class": "question"
+    },
+    {
+        "box": [
+            1076,
+            795,
+            1259,
+            840
+        ],
+        "text": "khoa_hoc",
+        "class": "question"
+    },
+    {
+        "box": [
+            304,
+            862,
+            500,
+            908
+        ],
+        "text": "he_dao_tao",
+        "class": "question"
+    },
+    {
+        "box": [
+            304,
+            925,
+            581,
+            974
+        ],
+        "text": "nam_tot_nghiep",
+        "class": "question"
+    },
+    {
+        "box": [
+            812,
+            925,
+            1073,
+            975
+        ],
+        "text": "ngay_cap_bang",
+        "class": "question"
+    },
+    {
+        "box": [
+            302,
+            994,
+            528,
+            1043
+        ],
+        "text": "so_hieu_bang",
+        "class": "question"
+    },
+    {
+        "box": [
+            818,
+            994,
+            995,
+            1041
+        ],
+        "text": "so_vao_so",
+        "class": "question"
+    },
+    {
+        "box": [
+            303,
+            1061,
+            910,
+            1112
+        ],
+        "text": "nay_toi_lam_don_nay_xin_cap_ban_sao",
+        "class": "question"
+    },
+    {
+        "box": [
+            303,
+            1128,
+            530,
+            1177
+        ],
+        "text": "so_luong_cap",
+        "class": "question"
+    },
+    {
+        "box": [
+            310,
+            1198,
+            423,
+            1243
+        ],
+        "text": "ly_do",
+        "class": "question"
+    },
+    {
+        "box": [
+            312,
+            1262,
+            530,
+            1307
+        ],
+        "text": "dien_thoai",
+        "class": "question"
+    },
+    {
+        "box": [
+            951,
+            1635,
+            1554,
+            1686
+        ],
+        "text": "ngay_tao_don",
+        "class": "date"
+    }
+]
