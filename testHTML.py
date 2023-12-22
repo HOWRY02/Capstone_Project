@@ -7,7 +7,7 @@ from fastapi import FastAPI, Depends, File, UploadFile, Form, Request, HTTPExcep
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from src.template_creater import TemplateCreater
-from src.utils.utility import load_image
+from src.utils.utility import load_image, find_relative_position
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
@@ -103,10 +103,23 @@ async def confirm_and_create_table(table_name: str):
 async def create_table_proceed(data: JSONData):
     try:
         data_dict = json.loads(data.data)
+        # sort data_dict
+        # data_dict.sort(key = lambda x: (x['box'][1], x['box'][0]))
+        data_dict.sort(key = lambda x: x['box'][1])
+
+        for i, item in enumerate(data_dict):
+            relative_position = find_relative_position(data_dict[i-1]['box'], item['box'])
+            if relative_position == 1:
+                data_dict[i]['box'][1] = min(data_dict[i-1]['box'][1], item['box'][1])
+                data_dict[i-1]['box'][1] = min(data_dict[i-1]['box'][1], item['box'][1])
+
+                data_dict[i]['box'][3] = max(data_dict[i-1]['box'][3], item['box'][3])
+                data_dict[i-1]['box'][3] = max(data_dict[i-1]['box'][3], item['box'][3])
+
         data_dict.sort(key = lambda x: (x['box'][1], x['box'][0]))
 
         # Filter JSON data for items where class is "text"
-        text_columns = [item['text'] for item in data_dict if item['class'] != 'title']
+        text_columns = [item['text'] for item in data_dict if (item['class'] == 'question' or item['class'] == 'date')]
         table_name = [item['text'] for item in data_dict if item['class'] == 'title'][0]
 
         # Generate MySQL table creation query

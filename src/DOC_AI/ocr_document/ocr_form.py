@@ -9,7 +9,7 @@
 # Import the necessary packages
 from pyimagesearch.alignment.align_images import align_images
 from collections import namedtuple
-import pytesseract
+# import pytesseract
 import argparse
 import imutils
 import cv2

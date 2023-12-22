@@ -20,7 +20,7 @@ function adjustInputElementsSize() {
   });
 
   // Adjust padding for question and title buttonz
-  const button_class = document.querySelectorAll('#submitButton, #questionButton, #titleButton, #dateButton');
+  const button_class = document.querySelectorAll('#submitButton, #questionButton, #answerButton, #titleButton, #dateButton');
   button_class.forEach(button => {
     button.style.fontSize = `${scaleFactor * 12}px`; // Adjust button font size
     button.style.padding = `${scaleFactor * 6}px ${scaleFactor * 13}px`; // Adjust button padding
@@ -54,12 +54,17 @@ function draw() {
         currentColor = colorTitle;
         break;
       case 'question':
-        ctx.strokeStyle = colorQuestion; // Set violet color for 'question' class
+        ctx.strokeStyle = colorQuestion; // Set green color for 'question' class
         ctx.strokeStyle = colorQuestion;
         currentColor = colorQuestion;
         break;
+      case 'answer':
+          ctx.strokeStyle = colorAnswer; // Set yellow color for 'answer' class
+          ctx.strokeStyle = colorAnswer;
+          currentColor = colorAnswer;
+          break;
       case 'date':
-        ctx.strokeStyle = colorDate; // Set violet color for 'question' class
+        ctx.strokeStyle = colorDate; // Set violet color for 'date' class
         ctx.strokeStyle = colorDate;
         currentColor = colorDate;
         break;

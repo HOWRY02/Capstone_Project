@@ -62,6 +62,18 @@ body {
   background-color: #13b258;
 }
 
+#answerButton {
+  padding: 8px 15px;
+  background-color: #941aff;
+  /* color: #fff; */
+  border: none;
+  cursor: pointer;
+}
+
+/* Optional: You can add more styling to the button (hover effects, etc.) */
+#answerButton:hover {
+  background-color: #380e5d;
+}
 
 #titleButton {
   padding: 8px 15px;

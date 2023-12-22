@@ -11,6 +11,7 @@ const loadInput = document.getElementById('loadInput');
 const saveButton = document.getElementById('saveButton');
 const titleButton = document.getElementById('titleButton');
 const questionButton = document.getElementById('questionButton');
+const answerButton = document.getElementById('answerButton');
 const dateButton = document.getElementById('dateButton');
 const submitButton = document.getElementById('submitButton');
 const textInput = document.getElementById('textInput');
@@ -30,6 +31,7 @@ let isResizing = false; // Flag to track resize status
 let currentMode = 'title'; // Default mode is 'title'
 let colorTitle = 'red';
 let colorQuestion = 'green';
+let colorAnswer = 'purple';
 let colorDate = 'blue';
 let currentColor = colorTitle;
 
@@ -242,6 +244,11 @@ titleButton.addEventListener('click', function () {
 // Event listener for the 'Question Mode' button
 questionButton.addEventListener('click', function () {
   setMode('question', colorQuestion); // Set mode to 'question' with green color
+});
+
+// Event listener for the 'Question Mode' button
+answerButton.addEventListener('click', function () {
+  setMode('answer', colorAnswer); // Set mode to 'question' with green color
 });
 
 // Event listener for the 'Question Mode' button

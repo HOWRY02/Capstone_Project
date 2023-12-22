@@ -22,6 +22,7 @@ opencv-contrib-python
 mariadb==1.0.11
 jinja2
 mysql-connector-python
+imutils
 #CPU
 paddlepaddle==2.4.2 -i https://mirror.baidu.com/pypi/simple
 #Cuda 11.7
