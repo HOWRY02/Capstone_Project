@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI, Depends, File, UploadFile, Form, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from src.template_creater import TemplateCreater
+from src.table_creater import TemplateCreater
 from src.utils.utility import load_image, find_relative_position
 
 with open("./config/doc_config.yaml", "r") as f:
@@ -55,7 +55,7 @@ async def creatingTable(request: Request,
                         imageInput: UploadFile = File()):
 
     img = load_image(imageInput.file)
-    template, status, [image, form_img] = creater.create(img, is_visualize)
+    template, status, [image, form_img] = creater.create_table(img, is_visualize)
 
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', image)
 

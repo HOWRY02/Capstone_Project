@@ -23,7 +23,7 @@ class LayoutAnalyzer():
             raise Exception('Text Recognizer is a singleton!')
         else:
             LayoutAnalyzer.__instance__ = self
-            self.model = YOLO('model/doc_model/yolov8_instance_segmentation/document_layout_analysis/best.pt')
+            self.model = YOLO('model/doc_model/yolov8_instance_segmentation/document_layout_analysis/v3/best.pt')
 
 
     def format_layout_result(self, layout_result):

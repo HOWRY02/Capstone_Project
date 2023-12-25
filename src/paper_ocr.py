@@ -5,6 +5,10 @@ import time
 import yaml
 import logging
 from PIL import Image
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
+
 from src.OCR.detection.text_detector import TextDetector
 from src.OCR.recognition.text_recognizer import TextRecognizer
 from src.OCR.extraction.text_extractor import TextExtractor
@@ -15,9 +19,6 @@ from utils.utility import padding_box, get_text_image, draw_boxes, preprocess_im
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
 STATUS = doc_config["status"]
-
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
 
 logging.getLogger().setLevel(logging.ERROR)
 os.environ['CURL_CA_BUNDLE'] = ''
@@ -45,7 +46,7 @@ class PaperOcrParser():
             self.text_extractor = TextExtractor.getInstance()
 
 
-    def extract_info(self, image, is_visualize):
+    def extract_info(self, image, is_visualize=False):
         """
         Match template with input image
         Input: input image
@@ -111,7 +112,7 @@ class PaperOcrParser():
                 new_form_result[key_form]['box'].append(form_box)
                 new_form_result[key_form]['text'].append(text)
 
-        # print(new_form_result)
+        print(new_form_result)
 
         form_name, position_of_form_name = self.text_extractor.extract_form_name(new_form_result['title'])
 
@@ -133,7 +134,8 @@ class PaperOcrParser():
 
 if __name__ == "__main__":
 
-    img_path = "src/data/written_file/don_mien_thi_1.jpg"
+    img_path = "config/template/don_mien_thi.png"
     image = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
     paper_ocr = PaperOcrParser()
-    paper_ocr.extract_info(image)
+    result, status_code, [boxes_img,layout_img,form_img] = paper_ocr.extract_info(image)
+    print(result)

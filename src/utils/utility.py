@@ -7,6 +7,7 @@ import base64
 import imutils
 import logging
 import requests
+import unidecode
 import numpy as np
 from PIL import Image
 from io import BytesIO
@@ -539,3 +540,19 @@ def remove_special_characters(input_string):
     result_string = re.sub(pattern, '', input_string)
     
     return result_string
+
+def make_underscore_name(text_list):
+
+    for i, text in enumerate(text_list):
+        lower_text = text.lower()
+        ascii_text = unidecode.unidecode(lower_text)
+        ascii_text = remove_special_characters(ascii_text)
+        # text_list[i] = ascii_text.replace(" ", "_")
+        ascii_words_in_text = ascii_text.split()
+
+        while '' in ascii_words_in_text:
+            ascii_words_in_text.remove('')
+
+        text_list[i] = '_'.join(ascii_words_in_text)
+
+    return text_list
