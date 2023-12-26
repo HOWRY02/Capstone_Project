@@ -4,7 +4,7 @@ from ultralytics import YOLO
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '..')))
 
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
@@ -49,6 +49,6 @@ class LayoutAnalyzer():
     def predict(self, image, conf=0.4):
         
         new_image = image.copy()
-        layout_result = self.format_layout_result(self.model.predict(new_image, conf=conf))
+        layout_result = self.format_layout_result(self.model.predict(new_image, conf=conf, verbose=False))
 
         return layout_result

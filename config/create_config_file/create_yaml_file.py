@@ -8,9 +8,10 @@ form_name_list = {"form_name":['đơn xin miễn thi',
                                'đơn xin xét chuyển trình độ đào tạo',
                                'đơn xin học môn thay thế',
                                'đơn xin miễn thi anh văn đầu ra',
-                               'đơn xin nhận điểm i (điểm chưa hoàn tất)']}
+                               'đơn xin nhận điểm i (điểm chưa hoàn tất)',
+                               'đơn xin phép nghỉ học']}
 
-name_of_column = {'ho ten':['ho ten sinh vien', 'toi ten', 'em la', 'ho va ten sinh vien', 'em ten'],
+name_of_column = {'ho ten':['ho ten sinh vien', 'toi ten', 'em la', 'ho va ten sinh vien', 'em ten', 'em ten la'],
                   'mssv':['ma sv', 'mssv', 'ma so sv', 'ma so sinh vien'],
                   'dien thoai':['dien thoai', 'so dt lien he'],
                   'lop':['lop'],

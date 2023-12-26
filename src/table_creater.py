@@ -13,7 +13,7 @@ from src.OCR.detection.text_detector import TextDetector
 from src.OCR.recognition.text_recognizer import TextRecognizer
 from src.OCR.extraction.text_extractor import TextExtractor
 from src.DOC_AI.form_understanding.form_understand import FormUnderstand
-from utils.utility import get_text_image, draw_layout_result, make_underscore_name
+from utils.utility import preprocess_image, get_text_image, draw_layout_result, make_underscore_name
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
@@ -22,21 +22,21 @@ STATUS = doc_config["status"]
 logging.getLogger().setLevel(logging.ERROR)
 os.environ['CURL_CA_BUNDLE'] = ''
 
-class TemplateCreater():
+class TableCreater():
     __instance__ = None
 
     @staticmethod
     def getInstance():
         """ Static access method. """
-        if TemplateCreater.__instance__ == None:
-            TemplateCreater()
-        return TemplateCreater.__instance__
+        if TableCreater.__instance__ == None:
+            TableCreater()
+        return TableCreater.__instance__
     
     def __init__(self):
-        if TemplateCreater.__instance__ != None:
+        if TableCreater.__instance__ != None:
             raise Exception("Prescription Parser is a singleton!")
         else:
-            TemplateCreater.__instance__ == self
+            TableCreater.__instance__ == self
             self.detector = TextDetector.getInstance()
             self.recognizer = TextRecognizer.getInstance()
             self.form_understand = FormUnderstand.getInstance()
@@ -50,6 +50,9 @@ class TemplateCreater():
         """
         start_time = time.time()
         status_code = "200"
+
+        # preprocess image (~8s)
+        # image = preprocess_image(image)
 
         template = {'title':    {'box':[], 'text':[]},
                     'question': {'box':[], 'text':[]},
@@ -110,7 +113,7 @@ class TemplateCreater():
         self.text_extractor.reset_info()
         print(time.time() - start_time)
 
-        return template_json, status_code, [image, form_img]
+        return template_json, status_code, [form_img]
 
 
     def find_text_in_big_box(self, image):
@@ -133,7 +136,7 @@ class TemplateCreater():
 
 if __name__ == "__main__":
 
-    img_path = "config/template/don_mien_thi.png"
-    image = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
-    template_creater = TemplateCreater()
-    template = template_creater.create_table(image)
+    img_path = "data_form/don_mien_thi.png"
+    image = cv2.imread(img_path, cv2.IMREAD_COLOR)
+    table_creater = TableCreater()
+    template = table_creater.create_table(image)

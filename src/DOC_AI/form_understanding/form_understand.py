@@ -1,11 +1,12 @@
 import os
 import sys
 from ultralytics import YOLO
-from utils.utility import find_relative_position
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '..')))
+
+from utils.utility import find_relative_position
 
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 

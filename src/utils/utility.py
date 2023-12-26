@@ -8,6 +8,7 @@ import imutils
 import logging
 import requests
 import unidecode
+import collections
 import numpy as np
 from PIL import Image
 from io import BytesIO
@@ -347,7 +348,40 @@ def draw_lines(image, lines, color=(0, 255, 0)):
 
     return image
 
-def align_images(image, template, maxFeatures=500, keepPercent=0.2, debug=False):
+def filter_parallel_matches(matches, keypointsA, keypointsB, threshold_angle=5):
+    # Filter matches based on parallelism
+    filtered_matches = []
+    angle_list = []
+    for match in matches:
+        ptA = keypointsA[match.queryIdx].pt
+        ptB = keypointsB[match.trainIdx].pt
+        
+        # Calculate angles between matched keypoints in both images
+        angle_difference = abs(calculate_angle(ptA, ptB))
+        angle_list.append(round(angle_difference))
+        
+    print(angle_list)
+    counter = collections.Counter(angle_list)
+    most_common_angle = counter.most_common(5)
+    print(most_common_angle)
+    for i, match in enumerate(matches):
+        # Check if the angle difference meets the threshold for parallel lines
+        if abs(angle_list[i] - most_common_angle[0][0]) < threshold_angle:
+            filtered_matches.append(match)
+    
+    return filtered_matches
+
+def calculate_angle(ptA, ptB):
+    # Calculate the angle between two points (representing lines)
+    # Replace this with the appropriate angle calculation for your context
+    # For example, you might use the slope of lines or specific geometric rules.
+    # This example assumes simple coordinate-based angle calculation.
+    angle_rad = np.arctan2(ptB[1] - ptA[1], ptB[0] - ptA[0])
+    angle_deg = np.degrees(angle_rad)
+    return angle_deg
+
+
+def align_images(image, template, maxFeatures=500, keepPercent=0.4, debug=False):
     # Convert both the input image and template to grayscale
     imageGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     templateGray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
@@ -364,6 +398,7 @@ def align_images(image, template, maxFeatures=500, keepPercent=0.2, debug=False)
     # Keep only the top matches
     keep = int(len(matches) * keepPercent)
     matches = matches[:keep]
+    # matches = filter_parallel_matches(matches, kpsA, kpsB, threshold_angle=2)
     # Check to see if we should visualize the matched keypoints
     if debug:
         matchedVis = cv2.drawMatches(image, kpsA, template, kpsB, matches, None)
@@ -385,7 +420,7 @@ def align_images(image, template, maxFeatures=500, keepPercent=0.2, debug=False)
     (h, w) = template.shape[:2]
     aligned = cv2.warpPerspective(image, H, (w, h))
     # Return the aligned image
-    return aligned, matches
+    return aligned
 
 def preprocess_image(image):
     """
@@ -393,7 +428,10 @@ def preprocess_image(image):
     Input: opencv image
     Output: preprocessed image
     """
-    img = cv2.resize(image, None, fx = 10000/image.shape[0], fy = 10000/image.shape[0])
+    img = cv2.resize(image, None, fx = 5000/image.shape[0], fy = 5000/image.shape[0])
+
+    kernel_erosion = np.ones((3,3),np.uint8) # 3,3
+    img = cv2.erode(img,kernel_erosion,iterations = 1)
 
     # Increase contrast
     lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
@@ -401,7 +439,7 @@ def preprocess_image(image):
 
     # Applying CLAHE to L-channel
     # feel free to try different values for the limit and grid size:
-    clahe = cv2.createCLAHE(clipLimit=5.0, tileGridSize=(6,6)) # clipLimit=15.0
+    clahe = cv2.createCLAHE(clipLimit=8.0, tileGridSize=(4,4)) # clipLimit=8.0 4,4
     cl = clahe.apply(l_channel)
 
     # Merge the CLAHE enhanced L-channel with the a and b channel
@@ -413,22 +451,22 @@ def preprocess_image(image):
 
     # Remove noise
     thresh = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
     gray_img = 255 - cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
 
     # Binarize image
     gray_img = cv2.adaptiveThreshold(gray_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 155, 11)
 
     # Erosion
-    kernel_erosion = np.ones((2,2),np.uint8)
-    erosion = cv2.erode(gray_img,kernel_erosion,iterations = 1)
+    kernel_erosion = np.ones((2,2),np.uint8) #2,2
+    erosion = cv2.dilate(gray_img,kernel_erosion,iterations = 1)
 
     # Enhance the edges and details
     kernel_enhancement = np.array([[0, -1, 0],[-1, 5,-1],[0, -1, 0]])
     erosion = cv2.filter2D(src=erosion, ddepth=-1, kernel=kernel_enhancement)
 
     # Resize image
-    erosion = cv2.resize(erosion, None, fx = 5000/img.shape[0], fy = 5000/img.shape[0])
+    erosion = cv2.resize(erosion, None, fx = 2500/img.shape[0], fy = 2500/img.shape[0])
 
     erosion = cv2.cvtColor(erosion, cv2.COLOR_GRAY2BGR)
 

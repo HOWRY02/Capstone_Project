@@ -3,24 +3,25 @@ import yaml
 import json
 import mysql.connector
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends, File, UploadFile, Form, Request, HTTPException
+from fastapi import FastAPI, Depends, File, UploadFile, Form, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from src.table_creater import TemplateCreater
+from src.table_creater import TableCreater
+from src.info_extracter import InfoExtracter
 from src.utils.utility import load_image, find_relative_position
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
 STATUS = doc_config["status"]
+
 app = FastAPI(title='Template Creater')
 
 app.mount("/static", StaticFiles(directory="src/WEB"), name="static")
 
 templates = Jinja2Templates(directory="src/WEB/resources/views")
 
-creater = TemplateCreater()  # create an instance of the Singleton class
-
-is_visualize = True
+table_creater = TableCreater()
+info_extracter = InfoExtracter()
 
 # MySQL config
 db_config = {
@@ -32,6 +33,20 @@ db_config = {
 
 class JSONData(BaseModel):
     data: str
+
+def check_table_exists(table_name):
+    try:
+        db = mysql.connector.connect(**db_config)
+        cursor = db.cursor()
+        cursor.execute(f"SHOW TABLES LIKE '{table_name}'")
+        result = cursor.fetchone()
+        cursor.close()
+        db.close()
+        return result is not None
+    except Exception as e:
+        print(f"Error checking table existence: {str(e)}")
+        return False
+
 
 @app.get("/")
 async def root(request: Request):
@@ -54,16 +69,10 @@ async def extractingInfoHome(request: Request):
 async def creatingTable(request: Request,
                         imageInput: UploadFile = File()):
 
-    img = load_image(imageInput.file)
-    template, status, [image, form_img] = creater.create_table(img, is_visualize)
+    image = load_image(imageInput.file)
+    template, status, [form_img] = table_creater.create_table(image)
 
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', image)
-
-    with open('result/template.json', 'w', encoding='utf-8') as outfile:
-        json.dump(template, outfile, ensure_ascii=False)
-
-    if is_visualize:
-        cv2.imwrite(f'result/form_img.jpg', form_img)
 
     return templates.TemplateResponse("create_table.html", {"request": request, "imagePath": 'public/img/temp_img.jpg', "jsonData": template})
 
@@ -72,21 +81,12 @@ async def creatingTable(request: Request,
 async def extractingInfo(request: Request,
                          imageInput: UploadFile = File()):
     
-    return templates.TemplateResponse("extract_info.html", {"request": request})
+    image = load_image(imageInput.file)
+    result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)
 
-
-def check_table_exists(table_name):
-    try:
-        db = mysql.connector.connect(**db_config)
-        cursor = db.cursor()
-        cursor.execute(f"SHOW TABLES LIKE '{table_name}'")
-        result = cursor.fetchone()
-        cursor.close()
-        db.close()
-        return result is not None
-    except Exception as e:
-        print(f"Error checking table existence: {str(e)}")
-        return False
+    cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', aligned)
+    
+    return templates.TemplateResponse("extract_info.html", {"request": request, "imagePath": 'public/img/temp_img.jpg', "jsonData": result})
 
 
 @app.post("/confirm_and_create_table")
@@ -104,7 +104,6 @@ async def create_table_proceed(data: JSONData):
     try:
         data_dict = json.loads(data.data)
         # sort data_dict
-        # data_dict.sort(key = lambda x: (x['box'][1], x['box'][0]))
         data_dict.sort(key = lambda x: x['box'][1])
 
         for i, item in enumerate(data_dict):
@@ -136,9 +135,42 @@ async def create_table_proceed(data: JSONData):
         cursor.close()
         db.close()
 
+        image = cv2.imread("src/WEB/public/img/temp_img.jpg", cv2.IMREAD_COLOR)
+        cv2.imwrite(f"config/template/{table_name}.jpg", image)
+
         with open(f"config/template_form/{table_name}.json", 'w', encoding='utf-8') as outfile:
             json.dump(data_dict, outfile, ensure_ascii=True)
 
         return {"message": f"Table '{table_name}' created successfully."}
     except Exception as e:
         return {"message": f"Error creating table: {str(e)}."}
+
+
+# FastAPI endpoint to insert data into MySQL table
+@app.post("/insert_data")
+async def insert_data(data: JSONData):
+    try:
+        data_dict = json.loads(data.data)
+
+        # Filter JSON data for items where class is "text"
+        text_columns = [item['text'] for item in data_dict if (item['class'] == 'answer' or item['class'] == 'date')]
+        text_values = [item['ocr_text'] for item in data_dict if (item['class'] == 'answer' or item['class'] == 'date')]
+        table_name = [item['text'] for item in data_dict if item['class'] == 'title'][0]
+
+        # Generate MySQL table creation query
+        columns = ', '.join(f"{col}" for col in text_columns)
+        values = ', '.join(f"'{val}'" for val in text_values)
+        query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
+
+        db = mysql.connector.connect(**db_config)
+        cursor = db.cursor()
+
+        cursor.execute(query)
+        db.commit()
+
+        cursor.close()
+        db.close()
+
+        return {"message": "Data inserted successfully"}
+    except Exception as e:
+        return {"message": f"Error inserting data: {str(e)}"}
