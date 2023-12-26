@@ -8,7 +8,7 @@ from typing_extensions import Annotated
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI, Depends, File, UploadFile, Form
 
-from src.template_creater import TemplateCreater
+from src.table_creater import TemplateCreater
 from src.utils.utility import load_image
 
 is_visualize = False
@@ -59,7 +59,7 @@ async def extracting(image: Annotated[UploadFile, File(...)],
             is_visualize = True
         else:
             is_visualize = False
-        template, status, [form_img] = creater.create(img, is_visualize)
+        template, status, [form_img] = creater.create_table(img, is_visualize)
         result = JSONResponse(status_code = int(status), 
                 content = {"status_code": status, 
                         "message": STATUS[status],
