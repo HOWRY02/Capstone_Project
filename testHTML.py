@@ -1,6 +1,8 @@
+import os
 import cv2
 import yaml
 import json
+import imutils
 import mysql.connector
 from pydantic import BaseModel
 from fastapi import FastAPI, Depends, File, UploadFile, Form, Request
@@ -22,6 +24,12 @@ templates = Jinja2Templates(directory="src/WEB/resources/views")
 
 table_creater = TableCreater()
 info_extracter = InfoExtracter()
+
+if not os.path.exists('config/template'):
+    os.makedirs('config/template')
+
+if not os.path.exists('config/template_form'):
+    os.makedirs('config/template_form')
 
 # MySQL config
 db_config = {
@@ -50,7 +58,7 @@ def check_table_exists(table_name):
 
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request, "imagePath": 'public/img/init_img.jpg'})
 
 
 @app.get("/creatingTable")
@@ -70,7 +78,8 @@ async def creatingTable(request: Request,
                         imageInput: UploadFile = File()):
 
     image = load_image(imageInput.file)
-    template, status, [form_img] = table_creater.create_table(image)
+    # image = imutils.resize(image, width=2000)
+    template, status_code, [] = table_creater.create_table(image, is_visualize=False)
 
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', image)
 
@@ -82,6 +91,7 @@ async def extractingInfo(request: Request,
                          imageInput: UploadFile = File()):
     
     image = load_image(imageInput.file)
+    # image = imutils.resize(image, width=2000)
     result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)
 
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', aligned)

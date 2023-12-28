@@ -348,78 +348,62 @@ def draw_lines(image, lines, color=(0, 255, 0)):
 
     return image
 
-def filter_parallel_matches(matches, keypointsA, keypointsB, threshold_angle=5):
-    # Filter matches based on parallelism
-    filtered_matches = []
-    angle_list = []
-    for match in matches:
-        ptA = keypointsA[match.queryIdx].pt
-        ptB = keypointsB[match.trainIdx].pt
-        
-        # Calculate angles between matched keypoints in both images
-        angle_difference = abs(calculate_angle(ptA, ptB))
-        angle_list.append(round(angle_difference))
-        
-    print(angle_list)
-    counter = collections.Counter(angle_list)
-    most_common_angle = counter.most_common(5)
-    print(most_common_angle)
-    for i, match in enumerate(matches):
-        # Check if the angle difference meets the threshold for parallel lines
-        if abs(angle_list[i] - most_common_angle[0][0]) < threshold_angle:
-            filtered_matches.append(match)
-    
-    return filtered_matches
-
-def calculate_angle(ptA, ptB):
-    # Calculate the angle between two points (representing lines)
-    # Replace this with the appropriate angle calculation for your context
-    # For example, you might use the slope of lines or specific geometric rules.
-    # This example assumes simple coordinate-based angle calculation.
-    angle_rad = np.arctan2(ptB[1] - ptA[1], ptB[0] - ptA[0])
-    angle_deg = np.degrees(angle_rad)
-    return angle_deg
-
-
-def align_images(image, template, maxFeatures=500, keepPercent=0.4, debug=False):
+def align_images(image, template, debug=False):
     # Convert both the input image and template to grayscale
     imageGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     templateGray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
-    # Use ORB to detect keypoints and extract (binary) local invariant features
-    orb = cv2.ORB_create(maxFeatures)
-    (kpsA, descsA) = orb.detectAndCompute(imageGray, None)
-    (kpsB, descsB) = orb.detectAndCompute(templateGray, None)
-    # Match the features
-    method = cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING
-    matcher = cv2.DescriptorMatcher_create(method)
-    matches = matcher.match(descsA, descsB, None)
-    # Sort the matches by their distance (the smaller the distance, the "more similar" the features are)
-    matches = sorted(matches, key=lambda x:x.distance)
-    # Keep only the top matches
-    keep = int(len(matches) * keepPercent)
-    matches = matches[:keep]
-    # matches = filter_parallel_matches(matches, kpsA, kpsB, threshold_angle=2)
+
+    # Initiate SIFT detector
+    sift = cv2.SIFT_create()
+    # find the keypoints and descriptors with SIFT
+    # Here img1 and img2 are grayscale images
+    (kpsA, descsA) = sift.detectAndCompute(imageGray,None)
+    (kpsB, descsB) = sift.detectAndCompute(templateGray,None)
+
+    # FLANN parameters
+    # I literally copy-pasted the defaults
+    FLANN_INDEX_KDTREE = 1
+    index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+    search_params = dict(checks=50)   # or pass empty dictionary
+    # do the matching
+    flann = cv2.FlannBasedMatcher(index_params,search_params)
+    raw_matches = flann.knnMatch(descsA,descsB,k=2)
+    matchesMask = [[0,0] for i in range(len(raw_matches))]
+    matches = []
+    for i,(m,n) in enumerate(raw_matches):
+        if m.distance < 0.4*n.distance:
+            matches.append((m,n))
+            matchesMask[i]=[1,0]
+
     # Check to see if we should visualize the matched keypoints
     if debug:
-        matchedVis = cv2.drawMatches(image, kpsA, template, kpsB, matches, None)
+        draw_params = dict(matchColor = (0,255,0),
+                   singlePointColor = (255,0,0),
+                   matchesMask = matchesMask,
+                   flags = cv2.DrawMatchesFlags_DEFAULT)
+        matchedVis = cv2.drawMatchesKnn(image, kpsA, template, kpsB, matches, None, **draw_params)
         matchedVis = imutils.resize(matchedVis, width=1000)
         cv2.imshow("Matched Keypoints", matchedVis)
         cv2.waitKey(0)
+
     # Allocate memory for the keypoints (x,y-coordinates) from the top matches
     # -- These coordinates are going to be used to compute our homography matrix
     ptsA = np.zeros((len(matches), 2), dtype="float")
     ptsB = np.zeros((len(matches), 2), dtype="float")
+
     # Loop over the top matches
-    for (i, m) in enumerate(matches):
+    for i,(m,n) in enumerate(matches):
         # Indicate that the two keypoints in the respective images map to each other
         ptsA[i] = kpsA[m.queryIdx].pt
         ptsB[i] = kpsB[m.trainIdx].pt
+
     # Compute the homography matrix between the two sets of matched points
     (H, mask) = cv2.findHomography(ptsA, ptsB, method=cv2.RANSAC)
+
     # Use the homography matrix to align the images
     (h, w) = template.shape[:2]
     aligned = cv2.warpPerspective(image, H, (w, h))
-    # Return the aligned image
+
     return aligned
 
 def preprocess_image(image):
@@ -428,7 +412,8 @@ def preprocess_image(image):
     Input: opencv image
     Output: preprocessed image
     """
-    img = cv2.resize(image, None, fx = 5000/image.shape[0], fy = 5000/image.shape[0])
+    # img = cv2.resize(image, None, fx = 5000/image.shape[0], fy = 5000/image.shape[0])
+    img = imutils.resize(image, width=5000)
 
     kernel_erosion = np.ones((3,3),np.uint8) # 3,3
     img = cv2.erode(img,kernel_erosion,iterations = 1)
@@ -466,7 +451,8 @@ def preprocess_image(image):
     erosion = cv2.filter2D(src=erosion, ddepth=-1, kernel=kernel_enhancement)
 
     # Resize image
-    erosion = cv2.resize(erosion, None, fx = 2500/img.shape[0], fy = 2500/img.shape[0])
+    # erosion = cv2.resize(erosion, None, fx = 2500/img.shape[0], fy = 2500/img.shape[0])
+    erosion = imutils.resize(erosion, width=2500)
 
     erosion = cv2.cvtColor(erosion, cv2.COLOR_GRAY2BGR)
 

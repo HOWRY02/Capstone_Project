@@ -27,13 +27,11 @@ class TextExtraction(object):
 
         form_name = None
         lower_text = text.lower()
-        ascii_words_in_text = lower_text.split()
 
         matches_str = process.extract(lower_text, self.form_name_list, scorer=fuzz.token_sort_ratio)
 
         if matches_str[0][1] > 80:
-            if len(ascii_words_in_text) > 3:
-                form_name = matches_str[0][0]
+            form_name = matches_str[0][0]
 
         return form_name
     

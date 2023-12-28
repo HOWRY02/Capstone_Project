@@ -54,7 +54,7 @@ class InfoExtracter():
         status_code = "200"
         
         # preprocess image (~8s)
-        image = preprocess_image(image)
+        # image = preprocess_image(image)
 
         title = {'box':[], 'text':[]}
 
@@ -68,8 +68,7 @@ class InfoExtracter():
         title_texts = []
         for box in title_boxes:
             cropped_image = get_text_image(image, box)
-            cropped_image = Image.fromarray(cropped_image)
-            rec_template = self.recognizer.recognize(cropped_image)
+            rec_template = self.find_text_in_big_box(cropped_image)
             title_texts.append(rec_template)
 
         title['box'] = title_boxes
@@ -113,7 +112,7 @@ class InfoExtracter():
                 result.append(loc)
 
         if is_visualize:
-            layout_img = draw_layout_result(aligned, layout_template, box_width=2, box_alpha=0.1)
+            layout_img = draw_layout_result(image, layout_document, box_width=2, box_alpha=0.1)
             cv2.imwrite('result/layout_img.jpg', layout_img)
 
         self.text_extractor.reset_info()
@@ -121,18 +120,19 @@ class InfoExtracter():
 
         return result, status_code, [aligned]
 
+
     def find_text_in_big_box(self, image):
         # detect all boxes in image
         detection = self.detector.detect(image)
         if detection is not None:
-            detection.reverse()
-            detection.sort(key = lambda x: x[1])
+            detection.sort(key = lambda x: x[0][1])
             for i, box in enumerate(detection):
                 relative_position = find_relative_position(detection[i-1], box)
                 if relative_position == 1:
-                    detection[i][1] = min(detection[i-1][1], box[1])
-                    detection[i-1][1] = min(detection[i-1][1], box[1])
-            detection.sort(key = lambda x: (x[1], x[0]))
+                    detection[i][0][1] = min(detection[i-1][0][1], box[0][1])
+                    detection[i-1][0][1] = min(detection[i-1][0][1], box[0][1])
+            detection.sort(key = lambda x: (x[0][1], x[0][0]))
+
             # recognize all texts
             recognition = []
             for box in detection:
@@ -150,7 +150,7 @@ class InfoExtracter():
 
 if __name__ == "__main__":
 
-    img_path = "data/printed_file/don_mien_thi_6.png"
+    img_path = "result/info_extraction_image/don_xin_nhan_tra_điem_I_1.png"
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     info_extracter = InfoExtracter()
-    template, status_code, [aligned] = info_extracter.extract_info(image)
+    template, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)
