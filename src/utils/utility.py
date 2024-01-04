@@ -406,17 +406,65 @@ def align_images(image, template, debug=False):
 
     return aligned
 
+# def preprocess_image(image):
+#     """
+#     Preprocess image
+#     Input: opencv image
+#     Output: preprocessed image
+#     """
+#     # img = cv2.resize(image, None, fx = 5000/image.shape[0], fy = 5000/image.shape[0])
+#     img = imutils.resize(image, width=5000)
+
+#     kernel_erosion = np.ones((3,3),np.uint8) # 3,3
+#     img = cv2.erode(img,kernel_erosion,iterations = 1)
+
+#     # Increase contrast
+#     lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+#     l_channel, a, b = cv2.split(lab_img)
+
+#     # Applying CLAHE to L-channel
+#     # feel free to try different values for the limit and grid size:
+#     clahe = cv2.createCLAHE(clipLimit=8.0, tileGridSize=(4,4)) # clipLimit=8.0 4,4
+#     cl = clahe.apply(l_channel)
+
+#     # Merge the CLAHE enhanced L-channel with the a and b channel
+#     limg = cv2.merge((cl,a,b))
+
+#     # Converting image from LAB Color model to GRAY color space
+#     brg_img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+#     gray_img = cv2.cvtColor(brg_img, cv2.COLOR_BGR2GRAY)
+
+#     # Remove noise
+#     thresh = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+#     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
+#     gray_img = 255 - cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
+
+#     # Binarize image
+#     gray_img = cv2.adaptiveThreshold(gray_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 155, 11)
+
+#     # Erosion
+#     kernel_dilation = np.ones((2,2),np.uint8) #2,2
+#     erosion = cv2.dilate(gray_img,kernel_dilation,iterations = 1)
+
+#     # Enhance the edges and details
+#     kernel_enhancement = np.array([[0, -1, 0],[-1, 5,-1],[0, -1, 0]])
+#     erosion = cv2.filter2D(src=erosion, ddepth=-1, kernel=kernel_enhancement)
+
+#     # Resize image
+#     # erosion = cv2.resize(erosion, None, fx = 2500/img.shape[0], fy = 2500/img.shape[0])
+#     erosion = imutils.resize(erosion, width=2500)
+
+#     erosion = cv2.cvtColor(erosion, cv2.COLOR_GRAY2BGR)
+
+#     return erosion
+
 def preprocess_image(image):
     """
     Preprocess image
     Input: opencv image
     Output: preprocessed image
     """
-    # img = cv2.resize(image, None, fx = 5000/image.shape[0], fy = 5000/image.shape[0])
     img = imutils.resize(image, width=5000)
-
-    kernel_erosion = np.ones((3,3),np.uint8) # 3,3
-    img = cv2.erode(img,kernel_erosion,iterations = 1)
 
     # Increase contrast
     lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
@@ -424,7 +472,7 @@ def preprocess_image(image):
 
     # Applying CLAHE to L-channel
     # feel free to try different values for the limit and grid size:
-    clahe = cv2.createCLAHE(clipLimit=8.0, tileGridSize=(4,4)) # clipLimit=8.0 4,4
+    clahe = cv2.createCLAHE(clipLimit=15.0, tileGridSize=(2,2)) # clipLimit=15 2,2
     cl = clahe.apply(l_channel)
 
     # Merge the CLAHE enhanced L-channel with the a and b channel
@@ -437,26 +485,13 @@ def preprocess_image(image):
     # Remove noise
     thresh = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
-    gray_img = 255 - cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
-
-    # Binarize image
-    gray_img = cv2.adaptiveThreshold(gray_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 155, 11)
-
-    # Erosion
-    kernel_erosion = np.ones((2,2),np.uint8) #2,2
-    erosion = cv2.dilate(gray_img,kernel_erosion,iterations = 1)
-
-    # Enhance the edges and details
-    kernel_enhancement = np.array([[0, -1, 0],[-1, 5,-1],[0, -1, 0]])
-    erosion = cv2.filter2D(src=erosion, ddepth=-1, kernel=kernel_enhancement)
+    binary_img = 255 - cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
 
     # Resize image
-    # erosion = cv2.resize(erosion, None, fx = 2500/img.shape[0], fy = 2500/img.shape[0])
-    erosion = imutils.resize(erosion, width=2500)
+    result_img = imutils.resize(binary_img, width=2000)
+    result_img = cv2.cvtColor(result_img, cv2.COLOR_GRAY2BGR)
 
-    erosion = cv2.cvtColor(erosion, cv2.COLOR_GRAY2BGR)
-
-    return erosion
+    return result_img
 
 def draw_result_text(img, text,
                      font=cv2.FONT_HERSHEY_COMPLEX,

@@ -54,7 +54,7 @@ class InfoExtracter():
         status_code = "200"
         
         # preprocess image (~8s)
-        # image = preprocess_image(image)
+        image = preprocess_image(image)
 
         title = {'box':[], 'text':[]}
 
@@ -68,12 +68,13 @@ class InfoExtracter():
         title_texts = []
         for box in title_boxes:
             cropped_image = get_text_image(image, box)
-            rec_template = self.find_text_in_big_box(cropped_image)
+            cropped_image = Image.fromarray(cropped_image)
+            rec_template = self.recognizer.recognize(cropped_image)
             title_texts.append(rec_template)
 
         title['box'] = title_boxes
         title['text'] = title_texts
-
+        print(title_texts)
         form_name, position_of_form_name = self.text_extractor.extract_form_name(title)
         form_name = make_underscore_name([form_name])[0]
 
@@ -150,7 +151,7 @@ class InfoExtracter():
 
 if __name__ == "__main__":
 
-    img_path = "result/info_extraction_image/don_xin_nhan_tra_điem_I_1.png"
+    img_path = "data/printed_file/don_mien_thi_1.png"
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     info_extracter = InfoExtracter()
     template, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)

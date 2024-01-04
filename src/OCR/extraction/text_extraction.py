@@ -29,9 +29,9 @@ class TextExtraction(object):
         lower_text = text.lower()
 
         matches_str = process.extract(lower_text, self.form_name_list, scorer=fuzz.token_sort_ratio)
-
-        if matches_str[0][1] > 80:
-            form_name = matches_str[0][0]
+        # print(matches_str)
+        # if matches_str[0][1] > 80:
+        form_name = matches_str[0][0]
 
         return form_name
     
