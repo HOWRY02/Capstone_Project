@@ -13,12 +13,13 @@ from src.utils.utility import load_image, hconcat_resize
 info_extracter = InfoExtracter()
 
 # Test directory
-test_dir = 'data/printed_file'
+test_dir = 'data/written_file/400_DPI'
+output_dir = 'result/written_img_result/400_DPI'
 
-if not os.path.exists('result/info_extraction_image'):
-    os.makedirs('result/info_extraction_image')
+if not os.path.exists(f'{output_dir}'):
+    os.makedirs(f'{output_dir}')
 
-is_visualize = True
+is_visualize = False
 
 def main():
     test_images = os.listdir(test_dir)
@@ -28,10 +29,9 @@ def main():
         try:
             img = load_image(test_dir + '/' + image)
 
-            template, status_code, [aligned] = info_extracter.extract_info(img, is_visualize)
+            template, status_code, [aligned] = info_extracter.extract_info(img)
 
-            if is_visualize:
-                cv2.imwrite(f'result/info_extraction_image/{image.split(".")[0]}.png', aligned)
+            cv2.imwrite(f'{output_dir}/{image.split(".")[0]}.png', aligned)
 
         except Exception as e:
             print(image)
