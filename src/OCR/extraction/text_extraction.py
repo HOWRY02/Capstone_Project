@@ -1,6 +1,13 @@
+import os
+import sys
 import unidecode
 from thefuzz import fuzz, process
-from utils.utility import config_form_name_list, config_name_of_column, flatten_comprehension
+
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(__dir__)
+sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
+
+from src.utils.utility import config_form_name_list, config_name_of_column, flatten_comprehension
 
 class TextExtraction(object):
     __instance__ = None

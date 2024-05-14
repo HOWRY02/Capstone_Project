@@ -13,7 +13,7 @@ from src.OCR.detection.text_detector import TextDetector
 from src.OCR.recognition.text_recognizer import TextRecognizer
 from src.OCR.extraction.text_extractor import TextExtractor
 from src.DOC_AI.form_understanding.form_understand import FormUnderstand
-from utils.utility import preprocess_image, get_text_image, draw_layout_result, make_underscore_name, find_relative_position
+from src.utils.utility import preprocess_image, get_text_image, draw_layout_result, make_underscore_name, find_relative_position
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)

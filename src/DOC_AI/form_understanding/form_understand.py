@@ -6,9 +6,9 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '..')))
 
-from utils.utility import find_relative_position
+from src.utils.utility import find_relative_position
 
-os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
+# os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
 class FormUnderstand():
     __instance__ = None
