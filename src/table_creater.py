@@ -13,7 +13,7 @@ from src.OCR.detection.text_detector import TextDetector
 from src.OCR.recognition.text_recognizer import TextRecognizer
 from src.OCR.extraction.text_extractor import TextExtractor
 from src.DOC_AI.form_understanding.form_understand import FormUnderstand
-from utils.utility import preprocess_image, get_text_image, draw_layout_result, make_underscore_name
+from src.utils.utility import preprocess_image, get_text_image, draw_layout_result, make_underscore_name, find_relative_position
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
@@ -106,30 +106,39 @@ class TableCreater():
                            'class': key_template}
                 template_json.append(element)
 
-        form_img = None
         if is_visualize:
             form_img = draw_layout_result(image, form_result, box_width=2, box_alpha=0.1)
+            cv2.imwrite('result/form_img.jpg', form_img)
 
         self.text_extractor.reset_info()
         print(time.time() - start_time)
 
-        return template_json, status_code, [form_img]
+        return template_json, status_code, []
 
 
     def find_text_in_big_box(self, image):
         # detect all boxes in image
         detection = self.detector.detect(image)
-        detection.reverse()
-        
-        # recognize all texts
-        recognition = []
-        for box in detection:
-            cropped_image = get_text_image(image, box)
-            cropped_image = Image.fromarray(cropped_image)
-            rec_result = self.recognizer.recognize(cropped_image)
-            recognition.append(rec_result)
+        if detection is not None:
+            detection.sort(key = lambda x: x[0][1])
+            for i, box in enumerate(detection):
+                relative_position = find_relative_position(detection[i-1], box)
+                if relative_position == 1:
+                    detection[i][0][1] = min(detection[i-1][0][1], box[0][1])
+                    detection[i-1][0][1] = min(detection[i-1][0][1], box[0][1])
+            detection.sort(key = lambda x: (x[0][1], x[0][0]))
 
-        text = ' '.join(recognition)
+            # recognize all texts
+            recognition = []
+            for box in detection:
+                cropped_image = get_text_image(image, box)
+                cropped_image = Image.fromarray(cropped_image)
+                rec_template = self.recognizer.recognize(cropped_image)
+                recognition.append(rec_template)
+
+            text = ' '.join(recognition)
+        else:
+            text = ''
 
         return text
 

@@ -1,16 +1,13 @@
-import argparse
 import os
 import sys
-import platform
 import cv2
-import numpy as np
-import paddle
-from PIL import Image, ImageDraw, ImageFont
 import math
-from paddle import inference
-import time
 import random
-from src.OCR.ppocr.utils.logging import get_logger
+import paddle
+import platform
+import numpy as np
+from paddle import inference
+from PIL import Image, ImageDraw, ImageFont
 
 
 def str2bool(v):

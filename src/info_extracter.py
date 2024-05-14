@@ -14,7 +14,7 @@ from src.OCR.detection.text_detector import TextDetector
 from src.OCR.recognition.text_recognizer import TextRecognizer
 from src.OCR.extraction.text_extractor import TextExtractor
 from src.DOC_AI.layout_analysis.layout_analyzer import LayoutAnalyzer
-from utils.utility import make_underscore_name, get_text_image, preprocess_image, align_images, find_class_of_box, draw_layout_result, find_relative_position
+from src.utils.utility import make_underscore_name, get_text_image, preprocess_image, align_images, find_class_of_box, draw_layout_result, find_relative_position
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
@@ -74,7 +74,7 @@ class InfoExtracter():
 
         title['box'] = title_boxes
         title['text'] = title_texts
-
+        print(title_texts)
         form_name, position_of_form_name = self.text_extractor.extract_form_name(title)
         form_name = make_underscore_name([form_name])[0]
 
@@ -113,7 +113,7 @@ class InfoExtracter():
                 result.append(loc)
 
         if is_visualize:
-            layout_img = draw_layout_result(aligned, layout_template, box_width=2, box_alpha=0.1)
+            layout_img = draw_layout_result(image, layout_document, box_width=2, box_alpha=0.1)
             cv2.imwrite('result/layout_img.jpg', layout_img)
 
         self.text_extractor.reset_info()
@@ -121,18 +121,19 @@ class InfoExtracter():
 
         return result, status_code, [aligned]
 
+
     def find_text_in_big_box(self, image):
         # detect all boxes in image
         detection = self.detector.detect(image)
         if detection is not None:
-            detection.reverse()
-            detection.sort(key = lambda x: x[1])
+            detection.sort(key = lambda x: x[0][1])
             for i, box in enumerate(detection):
                 relative_position = find_relative_position(detection[i-1], box)
                 if relative_position == 1:
-                    detection[i][1] = min(detection[i-1][1], box[1])
-                    detection[i-1][1] = min(detection[i-1][1], box[1])
-            detection.sort(key = lambda x: (x[1], x[0]))
+                    detection[i][0][1] = min(detection[i-1][0][1], box[0][1])
+                    detection[i-1][0][1] = min(detection[i-1][0][1], box[0][1])
+            detection.sort(key = lambda x: (x[0][1], x[0][0]))
+
             # recognize all texts
             recognition = []
             for box in detection:
@@ -150,7 +151,7 @@ class InfoExtracter():
 
 if __name__ == "__main__":
 
-    img_path = "data/printed_file/don_mien_thi_6.png"
+    img_path = "data/printed_file/don_mien_thi_1.png"
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     info_extracter = InfoExtracter()
-    template, status_code, [aligned] = info_extracter.extract_info(image)
+    template, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)

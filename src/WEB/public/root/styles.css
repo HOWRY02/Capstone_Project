@@ -1,0 +1,50 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Hides scrollbars */
+}
+
+.fullscreen-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.fullscreen-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the entire area */
+}
+
+.title {
+  position: absolute;
+  top: 20px; /* Adjust the distance from the top */
+  color: #fff;
+  font-size: 120px;
+}
+
+.button-container {
+  position: absolute;
+  top: 50%; /* Shifts the container to the middle vertically */
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: row;
+  justify-content: center; /* Aligns buttons in the center horizontally */
+}
+
+.top-button {
+  margin: 0 20px; /* Adjust the horizontal spacing between buttons */
+  padding: 40px 80px; /* Increase the padding to scale up the button */
+  font-size: 40px; /* Increase the font size */
+  background-color: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}

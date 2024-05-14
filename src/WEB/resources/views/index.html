@@ -3,17 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Template Creater</title>
+    <title>Template Parser</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/public/root/styles.css') }}">
 </head>
 
 <body>
-    <div class="container">
-        <form action="/extractingInfo" enctype="multipart/form-data" method="GET">
-            <button id="extractInfo">Extract Info</button>
-        </form>
-        <form action="/creatingTable" enctype="multipart/form-data" method="GET">
-            <button id="createTable">Create Table</button>
-        </form>
+    <div class="fullscreen-bg">
+        <img id="formImage" src="{{ url_for('static', path='/' + imagePath) }}" alt="Full Screen Image">
+        <h1 class="title">Template Parser</h1>
+        <div class="button-container">
+            <form action="/creatingTable" enctype="multipart/form-data" method="GET">
+                <button class="top-button" id="createTable">Create Table</button>
+            </form>
+            <form action="/extractingInfo" enctype="multipart/form-data" method="GET">
+                <button class="top-button" id="extractInfo">Extract Info</button>
+            </form>
+        </div>
     </div>
 </body>
 
