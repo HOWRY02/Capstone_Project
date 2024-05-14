@@ -1,2 +1,2 @@
 # Capstone project
-uvicorn testHTML:app --reload
+uvicorn main:app --reload
