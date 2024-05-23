@@ -34,7 +34,7 @@ class TableCreater():
     
     def __init__(self):
         if TableCreater.__instance__ != None:
-            raise Exception("Prescription Parser is a singleton!")
+            raise Exception("This class is a singleton!")
         else:
             TableCreater.__instance__ == self
             self.detector = TextDetector.getInstance()
@@ -51,7 +51,7 @@ class TableCreater():
         start_time = time.time()
         status_code = "200"
 
-        # preprocess image (~8s)
+        # preprocess image
         # image = preprocess_image(image)
 
         template = {'title':    {'box':[], 'text':[]},

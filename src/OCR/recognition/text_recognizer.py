@@ -22,7 +22,7 @@ class TextRecognizer():
 
     def __init__(self):
         if TextRecognizer.__instance__ != None:
-            raise Exception('Text Recognizer is a singleton!')
+            raise Exception('This class is a singleton!')
         else:
             TextRecognizer.__instance__ = self
 

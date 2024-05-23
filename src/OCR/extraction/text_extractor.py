@@ -19,7 +19,7 @@ class TextExtractor(TextExtraction):
 
     def __init__(self):
         if TextExtractor.__instance__ != None:
-            raise Exception('Template Matching is a singleton!')
+            raise Exception('This class is a singleton!')
         else:
             TextExtractor.__instance__ = self
 

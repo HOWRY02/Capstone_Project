@@ -25,7 +25,7 @@ class TextDetector(TextDetection):
 
     def __init__(self):
         if TextDetector.__instance__ != None:
-            raise Exception('Paddle Text Recognizer is a singleton!')
+            raise Exception('This class is a singleton!')
         else:
             TextDetector.__instance__ = self
 

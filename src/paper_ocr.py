@@ -35,7 +35,7 @@ class PaperOcrParser():
     
     def __init__(self):
         if PaperOcrParser.__instance__ != None:
-            raise Exception("Prescription Parser is a singleton!")
+            raise Exception("This class is a singleton!")
         else:
             PaperOcrParser.__instance__ == self
 

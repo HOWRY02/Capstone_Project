@@ -21,7 +21,7 @@ class TextExtraction(object):
 
     def __init__(self):
         if TextExtraction.__instance__ != None:
-            raise Exception('Template Matching is a singleton!')
+            raise Exception('This class is a singleton!')
         else:
             TextExtraction.__instance__ = self
             self.form_name_list = config_form_name_list()
