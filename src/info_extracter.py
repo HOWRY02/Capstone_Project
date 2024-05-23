@@ -35,7 +35,7 @@ class InfoExtracter():
     
     def __init__(self):
         if InfoExtracter.__instance__ != None:
-            raise Exception("Prescription Parser is a singleton!")
+            raise Exception("This class is a singleton!")
         else:
             InfoExtracter.__instance__ == self
             self.detector = TextDetector.getInstance()
