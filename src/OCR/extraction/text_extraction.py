@@ -1,6 +1,13 @@
+import os
+import sys
 import unidecode
 from thefuzz import fuzz, process
-from utils.utility import config_form_name_list, config_name_of_column, flatten_comprehension
+
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(__dir__)
+sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
+
+from src.utils.utility import config_form_name_list, config_name_of_column, flatten_comprehension
 
 class TextExtraction(object):
     __instance__ = None
@@ -14,7 +21,7 @@ class TextExtraction(object):
 
     def __init__(self):
         if TextExtraction.__instance__ != None:
-            raise Exception('Template Matching is a singleton!')
+            raise Exception('This class is a singleton!')
         else:
             TextExtraction.__instance__ = self
             self.form_name_list = config_form_name_list()
@@ -27,13 +34,11 @@ class TextExtraction(object):
 
         form_name = None
         lower_text = text.lower()
-        ascii_words_in_text = lower_text.split()
 
         matches_str = process.extract(lower_text, self.form_name_list, scorer=fuzz.token_sort_ratio)
-
-        if matches_str[0][1] > 80:
-            if len(ascii_words_in_text) > 3:
-                form_name = matches_str[0][0]
+        # print(matches_str)
+        # if matches_str[0][1] > 80:
+        form_name = matches_str[0][0]
 
         return form_name
     

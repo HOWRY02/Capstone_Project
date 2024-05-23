@@ -1,13 +1,14 @@
 import os
 import sys
-from src.OCR.recognition.tool.config import Cfg
-from src.OCR.recognition.tool.predictor import Predictor
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
 
-os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
+from src.OCR.recognition.tool.config import Cfg
+from src.OCR.recognition.tool.predictor import Predictor
+
+# os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
 class TextRecognizer():
     __instance__ = None
@@ -21,7 +22,7 @@ class TextRecognizer():
 
     def __init__(self):
         if TextRecognizer.__instance__ != None:
-            raise Exception('Text Recognizer is a singleton!')
+            raise Exception('This class is a singleton!')
         else:
             TextRecognizer.__instance__ = self
 

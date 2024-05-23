@@ -4,8 +4,11 @@ import cv2
 import yaml
 import torch
 import base64
+import imutils
 import logging
 import requests
+import unidecode
+import collections
 import numpy as np
 from PIL import Image
 from io import BytesIO
@@ -345,13 +348,123 @@ def draw_lines(image, lines, color=(0, 255, 0)):
 
     return image
 
+def align_images(image, template, debug=False):
+    # Convert both the input image and template to grayscale
+    imageGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    templateGray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+
+    # Initiate SIFT detector
+    sift = cv2.SIFT_create()
+    # find the keypoints and descriptors with SIFT
+    # Here img1 and img2 are grayscale images
+    (kpsA, descsA) = sift.detectAndCompute(imageGray,None)
+    (kpsB, descsB) = sift.detectAndCompute(templateGray,None)
+
+    # FLANN parameters
+    # I literally copy-pasted the defaults
+    FLANN_INDEX_KDTREE = 1
+    index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+    search_params = dict(checks=50)   # or pass empty dictionary
+    # do the matching
+    flann = cv2.FlannBasedMatcher(index_params,search_params)
+    raw_matches = flann.knnMatch(descsA,descsB,k=2)
+    matchesMask = [[0,0] for i in range(len(raw_matches))]
+    matches = []
+    for i,(m,n) in enumerate(raw_matches):
+        if m.distance < 0.4*n.distance:
+            matches.append((m,n))
+            matchesMask[i]=[1,0]
+
+    # Check to see if we should visualize the matched keypoints
+    if debug:
+        draw_params = dict(matchColor = (0,255,0),
+                   singlePointColor = (255,0,0),
+                   matchesMask = matchesMask,
+                   flags = cv2.DrawMatchesFlags_DEFAULT)
+        matchedVis = cv2.drawMatchesKnn(image, kpsA, template, kpsB, matches, None, **draw_params)
+        matchedVis = imutils.resize(matchedVis, width=1000)
+        cv2.imshow("Matched Keypoints", matchedVis)
+        cv2.waitKey(0)
+
+    # Allocate memory for the keypoints (x,y-coordinates) from the top matches
+    # -- These coordinates are going to be used to compute our homography matrix
+    ptsA = np.zeros((len(matches), 2), dtype="float")
+    ptsB = np.zeros((len(matches), 2), dtype="float")
+
+    # Loop over the top matches
+    for i,(m,n) in enumerate(matches):
+        # Indicate that the two keypoints in the respective images map to each other
+        ptsA[i] = kpsA[m.queryIdx].pt
+        ptsB[i] = kpsB[m.trainIdx].pt
+
+    # Compute the homography matrix between the two sets of matched points
+    (H, mask) = cv2.findHomography(ptsA, ptsB, method=cv2.RANSAC)
+
+    # Use the homography matrix to align the images
+    (h, w) = template.shape[:2]
+    aligned = cv2.warpPerspective(image, H, (w, h))
+
+    return aligned
+
+# def preprocess_image(image):
+#     """
+#     Preprocess image
+#     Input: opencv image
+#     Output: preprocessed image
+#     """
+#     # img = cv2.resize(image, None, fx = 5000/image.shape[0], fy = 5000/image.shape[0])
+#     img = imutils.resize(image, width=5000)
+
+#     kernel_erosion = np.ones((3,3),np.uint8) # 3,3
+#     img = cv2.erode(img,kernel_erosion,iterations = 1)
+
+#     # Increase contrast
+#     lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+#     l_channel, a, b = cv2.split(lab_img)
+
+#     # Applying CLAHE to L-channel
+#     # feel free to try different values for the limit and grid size:
+#     clahe = cv2.createCLAHE(clipLimit=8.0, tileGridSize=(4,4)) # clipLimit=8.0 4,4
+#     cl = clahe.apply(l_channel)
+
+#     # Merge the CLAHE enhanced L-channel with the a and b channel
+#     limg = cv2.merge((cl,a,b))
+
+#     # Converting image from LAB Color model to GRAY color space
+#     brg_img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+#     gray_img = cv2.cvtColor(brg_img, cv2.COLOR_BGR2GRAY)
+
+#     # Remove noise
+#     thresh = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+#     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
+#     gray_img = 255 - cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
+
+#     # Binarize image
+#     gray_img = cv2.adaptiveThreshold(gray_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 155, 11)
+
+#     # Erosion
+#     kernel_dilation = np.ones((2,2),np.uint8) #2,2
+#     erosion = cv2.dilate(gray_img,kernel_dilation,iterations = 1)
+
+#     # Enhance the edges and details
+#     kernel_enhancement = np.array([[0, -1, 0],[-1, 5,-1],[0, -1, 0]])
+#     erosion = cv2.filter2D(src=erosion, ddepth=-1, kernel=kernel_enhancement)
+
+#     # Resize image
+#     # erosion = cv2.resize(erosion, None, fx = 2500/img.shape[0], fy = 2500/img.shape[0])
+#     erosion = imutils.resize(erosion, width=2500)
+
+#     erosion = cv2.cvtColor(erosion, cv2.COLOR_GRAY2BGR)
+
+#     return erosion
+
 def preprocess_image(image):
     """
     Preprocess image
     Input: opencv image
     Output: preprocessed image
     """
-    img = cv2.resize(image, None, fx = 10000/image.shape[0], fy = 10000/image.shape[0])
+    img = imutils.resize(image, width=5000)
 
     # Increase contrast
     lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
@@ -359,7 +472,7 @@ def preprocess_image(image):
 
     # Applying CLAHE to L-channel
     # feel free to try different values for the limit and grid size:
-    clahe = cv2.createCLAHE(clipLimit=5.0, tileGridSize=(6,6)) # clipLimit=15.0
+    clahe = cv2.createCLAHE(clipLimit=15.0, tileGridSize=(2,2)) # clipLimit=15 2,2
     cl = clahe.apply(l_channel)
 
     # Merge the CLAHE enhanced L-channel with the a and b channel
@@ -371,26 +484,14 @@ def preprocess_image(image):
 
     # Remove noise
     thresh = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
-    gray_img = 255 - cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
-
-    # Binarize image
-    gray_img = cv2.adaptiveThreshold(gray_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 155, 11)
-
-    # Erosion
-    kernel_erosion = np.ones((2,2),np.uint8)
-    erosion = cv2.erode(gray_img,kernel_erosion,iterations = 1)
-
-    # Enhance the edges and details
-    kernel_enhancement = np.array([[0, -1, 0],[-1, 5,-1],[0, -1, 0]])
-    erosion = cv2.filter2D(src=erosion, ddepth=-1, kernel=kernel_enhancement)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
+    binary_img = 255 - cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
 
     # Resize image
-    erosion = cv2.resize(erosion, None, fx = 5000/img.shape[0], fy = 5000/img.shape[0])
+    result_img = imutils.resize(binary_img, width=2000)
+    result_img = cv2.cvtColor(result_img, cv2.COLOR_GRAY2BGR)
 
-    erosion = cv2.cvtColor(erosion, cv2.COLOR_GRAY2BGR)
-
-    return erosion
+    return result_img
 
 def draw_result_text(img, text,
                      font=cv2.FONT_HERSHEY_COMPLEX,
@@ -498,3 +599,19 @@ def remove_special_characters(input_string):
     result_string = re.sub(pattern, '', input_string)
     
     return result_string
+
+def make_underscore_name(text_list):
+
+    for i, text in enumerate(text_list):
+        lower_text = text.lower()
+        ascii_text = unidecode.unidecode(lower_text)
+        ascii_text = remove_special_characters(ascii_text)
+        # text_list[i] = ascii_text.replace(" ", "_")
+        ascii_words_in_text = ascii_text.split()
+
+        while '' in ascii_words_in_text:
+            ascii_words_in_text.remove('')
+
+        text_list[i] = '_'.join(ascii_words_in_text)
+
+    return text_list
