@@ -3,11 +3,13 @@ import cv2
 import yaml
 import json
 import imutils
+import uvicorn
 import mysql.connector
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends, File, UploadFile, Form, Request
+from fastapi import FastAPI, Depends, File, UploadFile, Form, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
 
 from src.table_creater import TableCreater
 from src.info_extracter import InfoExtracter
@@ -186,8 +188,23 @@ async def insert_data(data: JSONData):
     except Exception as e:
         return {"message": f"Error inserting data: {str(e)}"}
 
+    
+# Define the path to the mapping.json file
+json_file_path = "src/WEB/resources/script/extract_info/mapping.json"
+# Fast api endpoint to retrieve mapping.json and return the json object using get
+@app.get("/get-mapping", response_class=JSONResponse)
+async def get_mapping():
+    try:
+        # Open and read the JSON file
+        with open(json_file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="JSON file not found")
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Error decoding JSON file")
+
 
 # Run the application (optional, for development purposes)
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
