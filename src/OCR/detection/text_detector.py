@@ -34,7 +34,7 @@ class TextDetector(TextDetection):
                 use_gpu=True,
                 use_npu=False,
                 use_xpu=False,
-                gpu_mem=500,
+                gpu_mem=3000,
                 det_limit_side_len=960,
                 det_limit_type="max",
                 det_db_thresh=0.3,
