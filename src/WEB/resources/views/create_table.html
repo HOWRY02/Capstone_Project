@@ -4,43 +4,63 @@
 <head>
     <meta charset="UTF-8">
     <title>Creating Table</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/public/create_table/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/public/styles.css') }}">
+    <!-- CSS icon -->
+    <script src="https://kit.fontawesome.com/42bba25ae9.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <div class="container">
-        <div class="left-column">
-            <form action="/creatingTable/rec" enctype="multipart/form-data" method="POST">
-                <input type="file" id="imageInput" name="imageInput" accept="image/*">
-                <button id="submitButton">Submit</button>
-            </form>
-
-            <div id="hiddenJsonData" style="display: none;">{{ jsonData }}</div>
-
-            <div class="buttons-container">
-                <button id="titleButton">Title Mode</button>
-                <button id="questionButton">Question Mode</button>
-                <button id="answerButton">Answer Mode</button>
-                <button id="dateButton">Date Mode</button>
-            </div>
-
-            <div class="image-container">
-                <canvas id="imageCanvas"></canvas>
-                <img id="formImage" src="{{ url_for('static', path='/' + imagePath) }}" style="display: none;">
-            </div>
+    <div class="create-table-container">
+        <div id="menuBar" align="center">
+            <button id="homeButton"><i class="fa-solid fa-house"></i> Home Page</button>
+            <button id="extractButton"><i class="fa-solid fa-file-export"></i> Extract Info Page</button>
         </div>
+        
+        <div class="container">
+            <div class="left-column">
+                <form action="/creatingTable/rec" enctype="multipart/form-data" method="POST">
+                    <input type="file" id="imageInput" name="imageInput" accept="image/*">
+                    <button id="submitButton"><i class="fa-regular fa-image"></i> Submit</button>
+                </form>
 
-        <div class="right-column">
-            <input type="text" id="textInput" placeholder="Enter text for selected box">
-            <input type="file" id="loadInput" accept=".json">
-            <button id="saveButton">Save Template</button>
+                <div id="hiddenJsonData" style="display: none;">{{ jsonData }}</div>
 
-            <p id="templateDisplay" name="templateDisplay"></p>
-            <button id="createButton">Create Table</button>
+                <div class="buttons-container">
+                    <button id="titleButton"><i class="fas fa-tag"></i> Title Mode</button>
+                    <button id="questionButton"><i class="fas fa-question"></i> Question Mode</button>
+                    <button id="answerButton"><i class="fas fa-check"></i> Answer Mode</button>
+                    <button id="dateButton"><i class="far fa-calendar"></i> Date Mode</button>
+                </div>
+
+                <div class="image-container">
+                    <canvas id="imageCanvas"></canvas>
+                    <img id="formImage" src="{{ url_for('static', path='/' + imagePath) }}" style="display: none;">
+                </div>
+            </div>
+
+            <div class="right-column">
+                <input type="text" id="textInput" placeholder="Enter text for selected box">
+                <input type="file" id="loadInput" accept=".json">
+                <button id="saveButton"><i class="fa-solid fa-download"></i> Save Template</button>
+
+                <p id="templateDisplay" name="templateDisplay" style="display: none;"></p>
+                <h2 id="resultHeading">Fields Of Information</h2>
+                <div id="display-list">
+                    <ul id="">
+                        <li id="titleList">Title</li>
+                        <li id ="questionList">Question</li>
+                        <li id="answerList">Answer</li>
+                        <li id="dateList">Date</li>
+                    </ul>
+                </div>
+                <button id="createButton"><i class="fa-solid fa-upload"></i> Create Table</button>
+            </div>
         </div>
     </div>
+
     <script src="{{ url_for('static', path='/resources/script/create_table/utility.js') }}"></script>
     <script src="{{ url_for('static', path='/resources/script/create_table/main.js') }}"></script>
+    <script src="{{ url_for('static', path='/resources/script/create_table/display_data.js') }}"></script>
 </body>
 
 </html>

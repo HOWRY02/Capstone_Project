@@ -4,33 +4,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Extracting Infomation</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/public/extract_info/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/public/styles.css') }}">
+    <!-- CSS icon -->
+    <script src="https://kit.fontawesome.com/42bba25ae9.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <div class="container">
-        <div class="left-column">
-            <form action="/extractingInfo/rec" enctype="multipart/form-data" method="POST">
-                <input type="file" id="imageInput" name="imageInput" accept="image/*">
-                <button id="submitButton">Submit</button>
-            </form>
+    <div class="extract-info-container">
+        <div id="menuBar" align="center">
+            <button id="homeButton"><i class="fa-solid fa-house"></i> Home Page</button>
+            <button id="createButton"><i class="fa-solid fa-file-import"></i> Create Table Page</button>
+        </div>
+        
+        <div class="container">
+            <div class="left-column">
+                <form action="/extractingInfo/rec" enctype="multipart/form-data" method="POST" >
+                    
+                    <input type="file" id="imageInput" name="imageInput" accept="image/*" >
+                    <button id="submitButton"><i class="fa-regular fa-image"></i> Submit</button>
+                </form>
 
-            <div id="hiddenJsonData" style="display: none;">{{ jsonData }}</div>
+                <div id="hiddenJsonData" style="display: none;">{{ jsonData }}</div>
 
-            <div class="image-container">
-                <canvas id="imageCanvas"></canvas>
-                <img id="formImage" src="{{ url_for('static', path='/' + imagePath) }}" style="display: none;">
+                <div class="image-container">
+                    <canvas id="imageCanvas"></canvas>
+                    <img id="formImage" src="{{ url_for('static', path='/' + imagePath) }}" style="display: none;">
+                </div>
+            </div>
+
+            <div class="right-column">
+                <input type="text" id="textInput" placeholder="Enter text for selected box">
+                <p id="templateDisplay" name="templateDisplay" style="display: none;"></p>
+                <button id="updateButton">Update Table</button>
+                <div id="displayContainer"></div>
             </div>
         </div>
-
-        <div class="right-column">
-            <input type="text" id="textInput" placeholder="Enter text for selected box">
-            <p id="templateDisplay" name="templateDisplay"></p>
-            <button id="updateButton">Update Table</button>
-        </div>
     </div>
+
     <script src="{{ url_for('static', path='/resources/script/extract_info/utility.js') }}"></script>
     <script src="{{ url_for('static', path='/resources/script/extract_info/main.js') }}"></script>
+    <script src="{{ url_for('static', path='/resources/script/extract_info/display_data.js') }}"></script>
 </body>
 
 </html>
