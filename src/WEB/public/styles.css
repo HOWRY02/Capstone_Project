@@ -136,7 +136,7 @@
 
     /* Optional: You can add more styling to the button (hover effects, etc.) */
     #answerButton:hover {
-        background-color: #380e5d;
+        background-color: #780adab6;
     }
 
     #titleButton {
@@ -163,6 +163,19 @@
     /* Optional: You can add more styling to the button (hover effects, etc.) */
     #dateButton:hover {
         background-color: #0eaab6;
+    }
+
+    #tableButton {
+        padding: 8px 15px;
+        background-color: #ffe923;
+        /* color: #fff; */
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Optional: You can add more styling to the button (hover effects, etc.) */
+    #tableButton:hover {
+        background-color: #ffe600bb;
     }
 
     #saveButton {

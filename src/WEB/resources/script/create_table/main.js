@@ -13,6 +13,7 @@ const titleButton = document.getElementById('titleButton');
 const questionButton = document.getElementById('questionButton');
 const answerButton = document.getElementById('answerButton');
 const dateButton = document.getElementById('dateButton');
+const tableButton = document.getElementById('tableButton');
 const submitButton = document.getElementById('submitButton');
 const textInput = document.getElementById('textInput');
 const createButton = document.getElementById('createButton');
@@ -33,6 +34,7 @@ let colorTitle = 'red';
 let colorQuestion = 'green';
 let colorAnswer = 'purple';
 let colorDate = 'blue';
+let colorTable = 'yellow';
 let currentColor = colorTitle;
 
 tempImg = new Image();
@@ -256,6 +258,11 @@ answerButton.addEventListener('click', function () {
 // Event listener for the 'Question Mode' button
 dateButton.addEventListener('click', function () {
     setMode('date', colorDate); // Set mode to 'date' with violet color
+});
+
+// Event listener for the 'Question Mode' button
+tableButton.addEventListener('click', function () {
+    setMode('table', colorTable); // Set mode to 'date' with violet color
 });
 
 // Event listener for the text input field to update box text on pressing Enter
