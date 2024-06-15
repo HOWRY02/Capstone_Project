@@ -56,7 +56,7 @@ boxes = boxesTemp.map(data => ({
         startY: answer_data.box[3],
         width: answer_data.box[0] - answer_data.box[2],
         height: answer_data.box[1] - answer_data.box[3],
-        text: answer_data.text || '', // Ensure text property exists or set it to an empty string
+        text: answer_data.text || '',
         class: answer_data.class
     }))
 }));
@@ -220,12 +220,12 @@ imageCanvas.addEventListener('contextmenu', (e) => {
     mouseY = e.clientY - rect.top;
 
     // Find the index of the box at the clicked position
-    const boxIndex = findBox(mouseX, mouseY);
-
+    const index = boxes.indexOf(selectedBox);
     // If a box exists at the clicked position
-    if (boxIndex !== -1) {
-        // Remove the box from the boxes array
-        boxes.splice(boxIndex, 1);
+    if (index !== -1) {
+        // Remove the selected box from the boxes array
+        boxes.splice(index, 1);
+        selectedBox = null; // Clear the selectedBox reference
         draw();
     }
 });

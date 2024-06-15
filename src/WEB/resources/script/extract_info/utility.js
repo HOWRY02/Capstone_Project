@@ -183,24 +183,6 @@ function findHandle(x, y) {
     return { type: 'none', boxIndex: -1 };
 }
 
-// Function to find a box based on the coordinates (x, y)
-function findBox(x, y) {
-    // Loop through the boxes array
-    for (let i = 0; i < boxes.length; i++) {
-        const box = boxes[i];
-        // Check if the coordinates (x, y) fall within the boundaries of the current box
-        if (
-            x >= box.startX &&
-            x <= box.startX + box.width &&
-            y >= box.startY &&
-            y <= box.startY + box.height
-        ) {
-            return i; // Return the index of the box if found
-        }
-    }
-    return -1; // Return -1 if no box is found at the given coordinates
-}
-
 function formatBoxesToSave(boxes) {
     const boxesToSave = boxes.map(box => {
 
@@ -228,7 +210,7 @@ function formatBoxesToSave(boxes) {
             bottomRightY = box.startY + box.height;
         }
 
-        return { box: [topLeftX, topLeftY, bottomRightX, bottomRightY], text: box.text, class: box.class, ocr_text: box.ocr_text }
+        return { box: [topLeftX, topLeftY, bottomRightX, bottomRightY], text: box.text, class: box.class, ocr_text: box.answer_text }
     });
     return boxesToSave;
 }
