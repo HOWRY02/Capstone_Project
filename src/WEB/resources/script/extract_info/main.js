@@ -20,6 +20,7 @@ let isDragging = false; // Flag to track dragging action
 let mouseX, mouseY;
 let selectedBox = null;
 let boxes = []; // Array to store box coordinates
+let answer_boxes = []; // Array to store box coordinates
 let resizingBox = null; // Variable to track the box being resized
 let isResizing = false; // Flag to track resize status
 
@@ -50,8 +51,31 @@ boxes = boxesTemp.map(data => ({
     height: data.box[1] - data.box[3],
     text: data.text || '', // Ensure text property exists or set it to an empty string
     class: data.class,
-    ocr_text: data.ocr_text
+    answer_text: data.answer_text.map(answer_data => ({
+        startX: answer_data.box[2],
+        startY: answer_data.box[3],
+        width: answer_data.box[0] - answer_data.box[2],
+        height: answer_data.box[1] - answer_data.box[3],
+        text: answer_data.text || '', // Ensure text property exists or set it to an empty string
+        class: answer_data.class
+    }))
 }));
+
+// for (const dataTemp of boxesTemp) {
+//     // console.log(dataTemp)
+//     answer_boxes = answer_boxes.concat(dataTemp.answer_text.map(data => ({
+//         startX: data.box[2],
+//         startY: data.box[3],
+//         width: data.box[0] - data.box[2],
+//         height: data.box[1] - data.box[3],
+//         text: data.text || '', // Ensure text property exists or set it to an empty string
+//         class: data.class,
+//         // ocr_text: data.ocr_text
+//     })));
+// }
+// boxes = boxes.concat(answer_boxes)
+console.log(boxes)
+// console.log(answer_boxes)
 
 // Adding an event listener to 'imageInput' element when a file is selected
 imageInput.addEventListener('change', function (event) {
@@ -178,7 +202,7 @@ imageCanvas.addEventListener('mouseup', () => {
         // Update text for the selected box if it exists and the input text is not empty
         const textInput = document.getElementById('textInput');
         if (selectedBox !== null && textInput.value.trim() !== '') {
-            selectedBox.ocr_text = textInput.value.trim();
+            selectedBox.text = textInput.value.trim();
             textInput.style.display = 'none'; // Hide text input after saving text
         }
         draw();
@@ -231,13 +255,10 @@ textInput.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         // Check if a box is selected and the input text is not empty
         if (selectedBox !== null && textInput.value.trim() !== '') {
-            selectedBox.ocr_text = textInput.value.trim(); // Update the selected box text
+            selectedBox.text = textInput.value.trim(); // Update the selected box text
             textInput.style.display = 'none'; // Hide text input after saving text
             draw();
         }
-        // Display data
-        const jsonData = document.getElementById('templateDisplay').textContent;
-        displayField(jsonData);
     }
 });
 

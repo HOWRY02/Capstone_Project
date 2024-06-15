@@ -1,4 +1,3 @@
-
 // Function to fetch JSON data from the FastAPI endpoint
 async function fetchMappingData() {
     try {
@@ -19,7 +18,7 @@ async function fetchMappingData() {
     }
 }
 mapping = fetchMappingData()
-console.log(mapping)
+// console.log(mapping)
 
 
 function displayFields(boxes) {
@@ -40,12 +39,13 @@ function displayFields(boxes) {
 
         const fixedText = document.createElement('span');
         fixedText.className = 'fixed-text';
-        console.log(item.text);
+        // console.log(item.text);
 
         try {
-            const map = await mapping;
-            const replacedValue = map[item.text] || "Key not found in mapping";
-            fixedText.textContent = replacedValue + ': ' + item.ocr_text;
+            // const map = await mapping;
+            // const replacedValue = map[item.text] || "Key not found in mapping";
+            const replacedValue = item.text || "Key not found in mapping";
+            fixedText.textContent = replacedValue + ': ' + item.text;
         } catch (error) {
             console.error("Error:", error);
         }
@@ -54,19 +54,3 @@ function displayFields(boxes) {
         container.appendChild(fieldContainer);
     });
 }
-
-// Function to handle the event
-async function handleEvent() {
-    const jsonData = document.getElementById('templateDisplay').textContent;
-    console.log(jsonData); // Check the content of jsonData
-
-    try {
-        const parsedData = JSON.parse(jsonData); // Parse the JSON string
-        displayFields(parsedData); // Pass the parsed array to displayFields
-    } catch (error) {
-        console.error('Error parsing JSON:', error);
-    }
-}
-
-// Add event listener for click
-document.addEventListener('click', handleEvent);

@@ -86,7 +86,7 @@ function draw() {
 
         if (selectedBox === box) {
             // Display text input for the selected box
-            const text = box.ocr_text || '';
+            const text = box.text || '';
             const inputText = document.getElementById('textInput');
             inputText.value = text;
             inputText.style.display = 'block';
@@ -103,6 +103,8 @@ function draw() {
     // Display the ocr results
     const boxesToSave = formatBoxesToSave(boxes);
     document.getElementById('templateDisplay').textContent = JSON.stringify(boxesToSave);
+    // Display data
+    displayFields(boxesToSave);
 }
 
 // Function to remove boxes with absolute height or width < 0.5
