@@ -45,9 +45,7 @@ tempImg.onload = function () {
 tempImg.src = imgSrc;
 
 boxes = boxesTemp.map(data => {
-    let loc;
-    
-    loc = [{
+    let loc = [{
         startX: data.box[2],
         startY: data.box[3],
         width: data.box[0] - data.box[2],
@@ -202,21 +200,6 @@ imageCanvas.addEventListener('mouseup', () => {
 // Function to handle the contextmenu event on the imageCanvas
 imageCanvas.addEventListener('contextmenu', (e) => {
     e.preventDefault(); // Prevent the default context menu from appearing
-
-    // Get the position of the mouse relative to the imageCanvas
-    const rect = imageCanvas.getBoundingClientRect();
-    mouseX = e.clientX - rect.left;
-    mouseY = e.clientY - rect.top;
-
-    // Find the index of the box at the clicked position
-    const index = boxes.indexOf(selectedBox);
-    // If a box exists at the clicked position
-    if (index !== -1) {
-        // Remove the selected box from the boxes array
-        boxes.splice(index, 1);
-        selectedBox = null; // Clear the selectedBox reference
-        draw();
-    }
 });
 
 // Function to handle keydown events
