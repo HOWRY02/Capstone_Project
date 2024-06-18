@@ -6,14 +6,14 @@ import imutils
 import uvicorn
 import mysql.connector
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends, File, UploadFile, Form, Request, HTTPException
+from fastapi import FastAPI, Depends, File, UploadFile, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
 
 from src.table_creater import TableCreater
 from src.info_extracter import InfoExtracter
-from src.utils.utility import load_image, find_relative_position
+from src.utils.utility import load_image, find_relative_position, format_data_dict
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
@@ -151,6 +151,7 @@ async def create_table_proceed(data: JSONData):
         image = cv2.imread("src/WEB/public/img/temp_img.jpg", cv2.IMREAD_COLOR)
         cv2.imwrite(f"config/template/{table_name}.jpg", image)
 
+        data_dict = format_data_dict(data_dict)
         with open(f"config/template_form/{table_name}.json", 'w', encoding='utf-8') as outfile:
             json.dump(data_dict, outfile, ensure_ascii=True)
 
@@ -166,8 +167,8 @@ async def insert_data(data: JSONData):
         data_dict = json.loads(data.data)
 
         # Filter JSON data for items where class is "text"
-        text_columns = [item['text'] for item in data_dict if (item['class'] == 'answer' or item['class'] == 'date')]
-        text_values = [item['ocr_text'] for item in data_dict if (item['class'] == 'answer' or item['class'] == 'date')]
+        text_columns = [item['text'] for item in data_dict if (item['class'] == 'question' or item['class'] == 'date')]
+        text_values = [item['ocr_text'] for item in data_dict if (item['class'] == 'question' or item['class'] == 'date')]
         table_name = [item['text'] for item in data_dict if item['class'] == 'title'][0]
 
         # Generate MySQL table creation query
@@ -190,7 +191,7 @@ async def insert_data(data: JSONData):
 
     
 # Define the path to the mapping.json file
-json_file_path = "src/WEB/resources/script/extract_info/mapping.json"
+json_file_path = "src/WEB/resources/script/create_table/mapping.json"
 # Fast api endpoint to retrieve mapping.json and return the json object using get
 @app.get("/get-mapping", response_class=JSONResponse)
 async def get_mapping():

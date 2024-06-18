@@ -17,21 +17,12 @@ from datetime import timedelta
 def load_image(image_url):
     try:
         if "http://" not in image_url:
-            pil_image = Image.open(image_url)
+            pil_image = Image.open(image_url).convert('RGB')
         else:
             response = requests.get(image_url)
             if response.status_code != 200:
                 return None
-            pil_image = Image.open(BytesIO(response.content))
-        exif1 = pil_image._getexif()
-
-        if exif1 is not None and 274 in exif1:
-            if exif1[274] == 3:
-                pil_image=pil_image.rotate(180, expand=True)
-            elif exif1[274] == 6:
-                pil_image=pil_image.rotate(270, expand=True)
-            elif exif1[274] == 8:
-                pil_image=pil_image.rotate(90, expand=True)
+            pil_image = Image.open(BytesIO(response.content)).convert('RGB')
 
         img = np.array(pil_image)
         if len(img.shape) != 3:
@@ -45,7 +36,7 @@ def load_image(image_url):
             img = cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
         else:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        return img 
+        return img
     except Exception as ex:
         logging.info("exception error from load image: {}".format(ex))
         return None
@@ -364,7 +355,7 @@ def align_images(image, template, debug=False):
     # I literally copy-pasted the defaults
     FLANN_INDEX_KDTREE = 1
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-    search_params = dict(checks=50)   # or pass empty dictionary
+    search_params = dict(checks=25)   # or pass empty dictionary
     # do the matching
     flann = cv2.FlannBasedMatcher(index_params,search_params)
     raw_matches = flann.knnMatch(descsA,descsB,k=2)
@@ -615,3 +606,101 @@ def make_underscore_name(text_list):
         text_list[i] = '_'.join(ascii_words_in_text)
 
     return text_list
+
+
+def find_text_in_big_box(detector, recognizer, image):
+    # detect all boxes in image
+    detection = detector.detect(image)
+    if detection is not None:
+        if len(detection) > 1:
+            detection.sort(key = lambda x: x[0][1])
+            for i, box in enumerate(detection):
+                relative_position = find_relative_position(detection[i-1], box)
+                if relative_position == 1:
+                    detection[i][0][1] = min(detection[i-1][0][1], box[0][1])
+                    detection[i-1][0][1] = min(detection[i-1][0][1], box[0][1])
+            detection.sort(key = lambda x: (x[0][1], x[0][0]))
+
+        # recognize all texts
+        recognition = []
+        for box in detection:
+            cropped_image = get_text_image(image, box)
+            cropped_image = Image.fromarray(cropped_image)
+            rec_result = recognizer.recognize(cropped_image)
+            recognition.append(rec_result)
+
+        text = ' '.join(recognition)
+    else:
+        # cropped_image = Image.fromarray(image)
+        # rec_result = recognizer.recognize(cropped_image)
+        # text = rec_result
+        text = ''
+
+    return text
+
+def format_data_dict(data_dict):
+    '''
+    element = {
+        "box": [
+            770,
+            1519,
+            1456,
+            1564
+        ],
+        "text": "ngay_tao_don",
+        "class": "date",
+        "answer_text": [
+            {
+                "box": [
+                    770,
+                    1519,
+                    1456,
+                    1564
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    }
+    '''
+    # find class table
+    table_area = {'table': {'box':[]}}
+    for value_template in data_dict:
+        if value_template['class'] == 'table':
+            table_area['table']['box'] = [value_template['box']]
+            data_dict.remove(value_template)
+            break
+
+    result = []
+    table_question = []
+    table_answer = []
+    for i, value_template in enumerate(data_dict):
+        if len(table_area['table']['box']) > 0:
+            class_of_box = find_class_of_box(value_template['box'], table_area)
+        else:
+            class_of_box = 'other'
+
+        if class_of_box == 'table':
+            if value_template['class'] == 'question':
+                table_question.append(value_template)
+            else:
+                table_answer.append(value_template)  
+        else:
+            if value_template['class'] != 'answer':
+                element = value_template
+                if value_template['class'] == 'question':
+                    element['answer_text'] = [data_dict[i+1]]
+                else:
+                    element['answer_text'] = []
+                result.append(element)
+
+    for question in table_question:
+        element = question
+        element['answer_text'] = []
+        for answer in table_answer:
+            relative_position = find_relative_position(question['box'], answer['box'])
+            if relative_position == 2:
+                element['answer_text'].append(answer)
+        result.append(element)
+    
+    return result

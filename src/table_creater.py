@@ -13,7 +13,9 @@ from src.OCR.detection.text_detector import TextDetector
 from src.OCR.recognition.text_recognizer import TextRecognizer
 from src.OCR.extraction.text_extractor import TextExtractor
 from src.DOC_AI.form_understanding.form_understand import FormUnderstand
-from src.utils.utility import preprocess_image, get_text_image, draw_layout_result, make_underscore_name, find_relative_position
+from src.DOC_AI.layout_analysis.layout_analyzer import LayoutAnalyzer
+from src.utils.utility import preprocess_image, get_text_image, draw_layout_result, make_underscore_name
+from src.utils.utility import find_relative_position, find_text_in_big_box
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
@@ -40,6 +42,7 @@ class TableCreater():
             self.detector = TextDetector.getInstance()
             self.recognizer = TextRecognizer.getInstance()
             self.form_understand = FormUnderstand.getInstance()
+            self.layout_analyzer = LayoutAnalyzer.getInstance()
             self.text_extractor = TextExtractor.getInstance()
 
     def create_table(self, image, is_visualize=False):
@@ -56,47 +59,36 @@ class TableCreater():
 
         template = {'title':    {'box':[], 'text':[]},
                     'question': {'box':[], 'text':[]},
-                    'date':     {'box':[], 'text':[]}}
+                    'answer':   {'box':[], 'text':[]},
+                    'date':     {'box':[], 'text':[]},
+                    'table':    {'box':[], 'text':[]}}
 
         # form understanding
         form_result = self.form_understand.predict(image)
 
+        # document layout analysis
+        layout_result = self.layout_analyzer.predict(image)
+
         # find template boxes
-        title_boxes = form_result['title']['box'].copy()
-        question_boxes = form_result['question']['box'].copy()
+        for key in form_result:
+            template[key]['box'] = form_result[key]['box']
 
-        # find template title
-        title_texts = []
-        for box in title_boxes:
-            cropped_image = get_text_image(image, box)
-            cropped_image = Image.fromarray(cropped_image)
-            rec_result = self.recognizer.recognize(cropped_image)
-            title_texts.append(rec_result)
-
-        template['title']['box'] = title_boxes
-        template['title']['text'] = title_texts
-
+        # find template texts
+        for key in template:
+            for box in template[key]['box']:
+                cropped_image = get_text_image(image, box)
+                rec_result = find_text_in_big_box(self.detector, self.recognizer, cropped_image)
+                template[key]['text'].append(rec_result)
+        
         form_name, position_of_form_name = self.text_extractor.extract_form_name(template['title'])
+        question_texts = self.text_extractor.extract_column_name(template['question']['text'])
 
         template['title']['box'] = [position_of_form_name]
         template['title']['text'] = make_underscore_name([form_name])
-
-        # find template question
-        question_texts = []
-        for box in question_boxes:
-            cropped_image = get_text_image(image, box)
-            rec_result = self.find_text_in_big_box(cropped_image)
-            question_texts.append(rec_result)
-        
-        question_texts = self.text_extractor.extract_column_name(question_texts)
-
-        template['question']['box'] = question_boxes
         template['question']['text'] = make_underscore_name(question_texts)
-
-        # find template date
-        if len(form_result['date']['box']) > 0:
-            template['date']['box'].append(form_result['date']['box'][0])
-            template['date']['text'].append('ngay_tao_don')
+        template['date']['text'] = ['ngay_tao_don' for _ in template['date']['box']]
+        template['table']['box'] = layout_result['table']['box']
+        template['table']['text'] = ['bang' for _ in template['table']['box']]
 
         template_json = []
         for key_template, value_template in template.items():
@@ -116,36 +108,9 @@ class TableCreater():
         return template_json, status_code, []
 
 
-    def find_text_in_big_box(self, image):
-        # detect all boxes in image
-        detection = self.detector.detect(image)
-        if detection is not None:
-            detection.sort(key = lambda x: x[0][1])
-            for i, box in enumerate(detection):
-                relative_position = find_relative_position(detection[i-1], box)
-                if relative_position == 1:
-                    detection[i][0][1] = min(detection[i-1][0][1], box[0][1])
-                    detection[i-1][0][1] = min(detection[i-1][0][1], box[0][1])
-            detection.sort(key = lambda x: (x[0][1], x[0][0]))
-
-            # recognize all texts
-            recognition = []
-            for box in detection:
-                cropped_image = get_text_image(image, box)
-                cropped_image = Image.fromarray(cropped_image)
-                rec_template = self.recognizer.recognize(cropped_image)
-                recognition.append(rec_template)
-
-            text = ' '.join(recognition)
-        else:
-            text = ''
-
-        return text
-
-
 if __name__ == "__main__":
 
     img_path = "data_form/don_mien_thi.png"
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     table_creater = TableCreater()
-    template = table_creater.create_table(image)
+    template_json, status_code, [] = table_creater.create_table(image)
