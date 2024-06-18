@@ -25,6 +25,7 @@ let isDragging = false; // Flag to track dragging action
 let mouseX, mouseY;
 let selectedBox = null;
 let boxes = []; // Array to store box coordinates
+let answer_boxes = [];
 let resizingBox = null; // Variable to track the box being resized
 let isResizing = false; // Flag to track resize status
 
@@ -57,6 +58,61 @@ boxes = boxesTemp.map(data => ({
     text: data.text || '', // Ensure text property exists or set it to an empty string
     class: data.class
 }));
+
+// boxes = boxesTemp.map(data => ({
+//     startX: data.box[2],
+//     startY: data.box[3],
+//     width: data.box[0] - data.box[2],
+//     height: data.box[1] - data.box[3],
+//     text: data.text || '', // Ensure text property exists or set it to an empty string
+//     class: data.class,
+//     answer_text: data.answer_text.map(answer_data => ({
+//         startX: answer_data.box[2],
+//         startY: answer_data.box[3],
+//         width: answer_data.box[0] - answer_data.box[2],
+//         height: answer_data.box[1] - answer_data.box[3],
+//         text: answer_data.text || '', // Ensure text property exists or set it to an empty string
+//         class: answer_data.class
+//     }))
+// }));
+
+// for (const dataTemp of boxesTemp) {
+//     console.log(dataTemp)
+//     if (dataTemp.answer_text) {
+//         answer_boxes = answer_boxes.concat(dataTemp.answer_text.map(data => ({
+//         startX: data.box[2],
+//         startY: data.box[3],
+//         width: data.box[0] - data.box[2],
+//         height: data.box[1] - data.box[3],
+//         text: data.text || '', // Ensure text property exists or set it to an empty string
+//         class: data.class
+//     })));
+//     }
+// }
+// boxes = boxes.concat(answer_boxes)
+
+
+// boxes = boxesTemp.map(data => {
+//     let loc = [{
+//         startX: data.box[2],
+//         startY: data.box[3],
+//         width: data.box[0] - data.box[2],
+//         height: data.box[1] - data.box[3],
+//         text: data.text || '', // Ensure text property exists or set it to an empty string
+//         class: data.class
+//     }]
+
+//     loc = loc.concat(data.answer_text.map(answer_data => ({
+//         startX: answer_data.box[2],
+//         startY: answer_data.box[3],
+//         width: answer_data.box[0] - answer_data.box[2],
+//         height: answer_data.box[1] - answer_data.box[3],
+//         text: answer_data.text || '',
+//         class: answer_data.class
+//     })))
+
+//     return loc;
+// });
 
 // Adding an event listener to 'imageInput' element when a file is selected
 imageInput.addEventListener('change', function (event) {
@@ -98,6 +154,49 @@ imageInput.addEventListener('change', function (event) {
 });
 
 // Adding a mousedown event listener to the imageCanvas
+// imageCanvas.addEventListener('mousedown', (e) => {
+//     // Getting the position of the canvas relative to the viewport
+//     const rect = imageCanvas.getBoundingClientRect();
+
+//     // Calculating the mouse coordinates relative to the canvas
+//     mouseX = e.clientX - rect.left;
+//     mouseY = e.clientY - rect.top;
+
+//     // Determining the type of action and the index of the box based on the mouse coordinates
+//     const { type, boxIndex } = findHandle(mouseX, mouseY);
+
+//     // Handling different actions based on the detected type
+//     if (type === 'resize') {
+//         // If a resize action is detected
+//         isDragging = false;
+//         isResizing = true;
+//         resizingBox = boxes[boxIndex]; // Getting the box to be resized
+//         selectedBox = resizingBox; // Selecting the box when clicking on the resize handle
+//     } else if (type === 'drag') {
+//         // If a drag action is detected
+//         isDragging = true;
+//         selectedBox = boxes[boxIndex]; // Selecting the box to be dragged
+//     } else {
+//         // If neither resize nor drag action is detected
+//         if (selectedBox !== null && selectedBox === boxes[boxIndex]) {
+//             // If the clicked box is already selected, deselect it
+//             selectedBox = null;
+//         } else {
+//             // If a new box creation action is detected
+//             isDragging = true;
+//             // Creating a new box at the clicked position with initial dimensions
+//             const box = {
+//                 startX: Math.round(mouseX), startY: Math.round(mouseY),
+//                 width: 0, height: 0, class: currentMode
+//             };
+//             boxes.push(box); // Adding the new box to the boxes array
+//             selectedBox = box; // Setting the newly created box as selected
+//         }
+//     }
+//     draw();
+// });
+
+// Adding a mousedown event listener to the imageCanvas
 imageCanvas.addEventListener('mousedown', (e) => {
     // Getting the position of the canvas relative to the viewport
     const rect = imageCanvas.getBoundingClientRect();
@@ -119,22 +218,24 @@ imageCanvas.addEventListener('mousedown', (e) => {
     } else if (type === 'drag') {
         // If a drag action is detected
         isDragging = true;
+        isResizing = false;
         selectedBox = boxes[boxIndex]; // Selecting the box to be dragged
     } else {
         // If neither resize nor drag action is detected
-        if (selectedBox !== null && selectedBox === boxes[boxIndex]) {
+        if (selectedBox === boxes[boxIndex]) {
             // If the clicked box is already selected, deselect it
             selectedBox = null;
         } else {
             // If a new box creation action is detected
-            isDragging = true;
+            isResizing = true;
             // Creating a new box at the clicked position with initial dimensions
             const box = {
                 startX: Math.round(mouseX), startY: Math.round(mouseY),
                 width: 0, height: 0, class: currentMode
             };
             boxes.push(box); // Adding the new box to the boxes array
-            selectedBox = box; // Setting the newly created box as selected
+            resizingBox = box;
+            selectedBox = resizingBox; // Setting the newly created box as selected
         }
     }
     draw();
@@ -149,28 +250,56 @@ imageCanvas.addEventListener('mousemove', (e) => {
     mouseX = e.clientX - rect.left;
     mouseY = e.clientY - rect.top;
 
-    // Checking if dragging action is ongoing
-    if (isDragging) {
-        // Handling box movement or resizing based on the action type
-        if (selectedBox !== null && !isResizing) {
-            // If dragging a box (not resizing)
-            const dx = mouseX - selectedBox.startX;
-            const dy = mouseY - selectedBox.startY;
-
+    // Handling box movement or resizing based on the action type
+    if (selectedBox !== null) {
+        if (isDragging && selectedBox !== null) {
             // Updating box position and dimensions based on mouse movement
-            selectedBox.startX = Math.round(mouseX);
-            selectedBox.startY = Math.round(mouseY);
-            selectedBox.width -= Math.round(dx);
-            selectedBox.height -= Math.round(dy);
+            selectedBox.startX = Math.round(mouseX - selectedBox.width);
+            selectedBox.startY = Math.round(mouseY - selectedBox.height);
         } else if (isResizing && resizingBox !== null) {
-            // If resizing a box
-            // Calculating and updating the resized box dimensions based on mouse movement
-            resizingBox.width = Math.round(Math.max(0, mouseX - resizingBox.startX));
-            resizingBox.height = Math.round(Math.max(0, mouseY - resizingBox.startY));
+            const dx = mouseX - resizingBox.startX;
+            const dy = mouseY - resizingBox.startY;
+            // Updating box position and dimensions based on mouse movement
+            resizingBox.startX = Math.round(mouseX);
+            resizingBox.startY = Math.round(mouseY);
+            resizingBox.width -= Math.round(dx);
+            resizingBox.height -= Math.round(dy);
         }
         draw();
     }
 });
+
+// Function handling mouse movement on the imageCanvas
+// imageCanvas.addEventListener('mousemove', (e) => {
+//     // Getting the position of the canvas relative to the viewport
+//     const rect = imageCanvas.getBoundingClientRect();
+
+//     // Calculating the mouse coordinates relative to the canvas
+//     mouseX = e.clientX - rect.left;
+//     mouseY = e.clientY - rect.top;
+
+//     // Checking if dragging action is ongoing
+//     if (isDragging) {
+//         // Handling box movement or resizing based on the action type
+//         if (selectedBox !== null && !isResizing) {
+//             // If dragging a box (not resizing)
+//             const dx = mouseX - selectedBox.startX;
+//             const dy = mouseY - selectedBox.startY;
+
+//             // Updating box position and dimensions based on mouse movement
+//             selectedBox.startX = Math.round(mouseX);
+//             selectedBox.startY = Math.round(mouseY);
+//             selectedBox.width -= Math.round(dx);
+//             selectedBox.height -= Math.round(dy);
+//         } else if (isResizing && resizingBox !== null) {
+//             // If resizing a box
+//             // Calculating and updating the resized box dimensions based on mouse movement
+//             resizingBox.width = Math.round(Math.max(0, mouseX - resizingBox.startX));
+//             resizingBox.height = Math.round(Math.max(0, mouseY - resizingBox.startY));
+//         }
+//         draw();
+//     }
+// });
 
 // Adding comment to the event listener for 'mouseup' on imageCanvas
 imageCanvas.addEventListener('mouseup', () => {
@@ -194,21 +323,6 @@ imageCanvas.addEventListener('mouseup', () => {
 // Function to handle the contextmenu event on the imageCanvas
 imageCanvas.addEventListener('contextmenu', (e) => {
     e.preventDefault(); // Prevent the default context menu from appearing
-
-    // Get the position of the mouse relative to the imageCanvas
-    const rect = imageCanvas.getBoundingClientRect();
-    mouseX = e.clientX - rect.left;
-    mouseY = e.clientY - rect.top;
-
-    // Find the index of the box at the clicked position
-    const boxIndex = findBox(mouseX, mouseY);
-
-    // If a box exists at the clicked position
-    if (boxIndex !== -1) {
-        // Remove the box from the boxes array
-        boxes.splice(boxIndex, 1);
-        draw();
-    }
 });
 
 // Function to handle keydown events

@@ -87,17 +87,17 @@ async function displayFields(boxes) {
 }
 
 // Function to handle the event
-async function handleEvent() {
-    const jsonData = document.getElementById('templateDisplay').textContent;
-    console.log(jsonData); // Check the content of jsonData
+// async function handleEvent() {
+//     const jsonData = document.getElementById('templateDisplay').textContent;
+//     console.log(jsonData); // Check the content of jsonData
 
-    try {
-        const parsedData = JSON.parse(jsonData); // Parse the JSON string
-        displayFields(parsedData); // Pass the parsed array to displayFields
-    } catch (error) {
-        console.error('Error parsing JSON:', error);
-    }
-}
+//     try {
+//         const parsedData = JSON.parse(jsonData); // Parse the JSON string
+//         displayFields(parsedData); // Pass the parsed array to displayFields
+//     } catch (error) {
+//         console.error('Error parsing JSON:', error);
+//     }
+// }
 
-// Add event listener for click
-document.addEventListener('click', handleEvent);
+// // Add event listener for click
+// document.addEventListener('click', handleEvent);

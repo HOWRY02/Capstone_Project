@@ -50,17 +50,6 @@ function adjustInputElementsSize() {
 
 
 }
-// function drawImageScaled(img, ctx) {
-//   var canvas = ctx.canvas ;
-//   var hRatio = canvas.width  / img.width    ;
-//   var vRatio =  canvas.height / img.height  ;
-//   var ratio  = Math.min ( hRatio, vRatio );
-//   var centerShift_x = ( canvas.width - img.width*ratio ) / 2;
-//   var centerShift_y = ( canvas.height - img.height*ratio ) / 2;  
-//   ctx.clearRect(0,0,canvas.width, canvas.height);
-//   ctx.drawImage(img, 0,0, img.width, img.height,
-//                      centerShift_x,centerShift_y,img.width*ratio, img.height*ratio);  
-// }
 
 function delareImage() {
     if (isSubmiting) {
@@ -185,18 +174,31 @@ function findHandle(x, y) {
             bottomRightY = box.startY + box.height;
         }
 
+        // // Calculate the center of the box
+        // const centerX = bottomRightX;
+        // const centerY = bottomRightY;
+
+        // // Calculate the distance between the mouse pointer and the center of the box
+        // const distX = x - centerX;
+        // const distY = y - centerY;
+        // const distance = Math.sqrt(distX * distX + distY * distY);
+
+        // // If the distance is within a threshold (6 in this case), consider it a resize handle
+        // if (distance <= 6) {
+        //     return { type: 'resize', boxIndex: i }; // Return resize handle type and box index
+        // }
         // Calculate the center of the box
-        const centerX = bottomRightX;
-        const centerY = bottomRightY;
+        const dragPointX = topLeftX;
+        const dragPointY = topLeftY;
 
         // Calculate the distance between the mouse pointer and the center of the box
-        const distX = x - centerX;
-        const distY = y - centerY;
+        const distX = x - dragPointX;
+        const distY = y - dragPointY;
         const distance = Math.sqrt(distX * distX + distY * distY);
 
         // If the distance is within a threshold (6 in this case), consider it a resize handle
         if (distance <= 6) {
-            return { type: 'resize', boxIndex: i }; // Return resize handle type and box index
+            return { type: 'drag', boxIndex: i }; // Return resize handle type and box index
         }
 
         // Check if the mouse pointer is inside the bounding box of the current box
@@ -206,7 +208,7 @@ function findHandle(x, y) {
             y >= Math.min(topLeftY, bottomRightY) &&
             y <= Math.max(topLeftY, bottomRightY)
         ) {
-            return { type: 'drag', boxIndex: i }; // Return drag type and box index
+            return { type: 'resize', boxIndex: i }; // Return drag type and box index
         }
     }
 
@@ -290,6 +292,20 @@ function loadBoxes(event) {
                 text: data.text || '', // Ensure text property exists or set it to an empty string
                 class: data.class
             }));
+
+            for (const dataTemp of loadedData) {
+                answer_boxes = answer_boxes.concat(dataTemp.answer_text.map(data => ({
+                startX: data.box[2],
+                startY: data.box[3],
+                width: data.box[0] - data.box[2],
+                height: data.box[1] - data.box[3],
+                text: data.text || '', // Ensure text property exists or set it to an empty string
+                class: data.class
+            })));
+            }
+
+            boxes = boxes.concat(answer_boxes)
+
             draw();
         };
         reader.readAsText(file); // Read the contents of the file as text
