@@ -4,6 +4,7 @@ import yaml
 import json
 import imutils
 import uvicorn
+import subprocess
 import mysql.connector
 from pydantic import BaseModel
 from fastapi import FastAPI, Depends, File, UploadFile, Request, HTTPException
@@ -74,6 +75,11 @@ async def creatingTableHome(request: Request):
 async def extractingInfoHome(request: Request):
     template = []
     return templates.TemplateResponse("extract_info.html", {"request": request, "imagePath": 'public/img/init_img.jpg', "jsonData": template})
+
+
+@app.get("/showingData")
+async def extractingInfoHome(request: Request):
+    return templates.TemplateResponse("show_data.html", {"request": request})
 
 
 @app.post("/creatingTable/rec")
@@ -204,6 +210,86 @@ async def get_mapping():
         raise HTTPException(status_code=404, detail="JSON file not found")
     except json.JSONDecodeError:
         raise HTTPException(status_code=500, detail="Error decoding JSON file")
+
+# Endpoint to retrieve a list of available tables
+@app.get("/tables")
+async def get_available_tables():
+    try:
+        db = mysql.connector.connect(**db_config)
+        cursor = db.cursor()
+        # Implement logic to retrieve a list of table names from the database
+        # You can use information_schema.tables or similar approach
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = %s", (db_config['database'],))
+        table_names = [row[0] for row in cursor.fetchall()]
+        cursor.close()
+        db.close()
+        return table_names
+    except Exception as e:
+        print(f"Error retrieving table names: {str(e)}")
+        return {"message": "Error retrieving table names."}
+
+# Endpoint to retrieve all data from a specific table
+@app.get("/tables/{table_name}")
+async def get_table_data(table_name: str):
+    if not check_table_exists(table_name):
+        return {"message": f"Table '{table_name}' does not exist."}
+    try:
+        db = mysql.connector.connect(**db_config)
+        cursor = db.cursor()
+        # Get column names
+        cursor.execute(f"SELECT COLUMN_NAME FROM information_schema.columns WHERE table_schema = %s AND table_name = %s", (db_config['database'], table_name))
+        column_names = [row[0] for row in cursor.fetchall()]
+
+        # Get table data
+        cursor.execute(f"SELECT * FROM {table_name}")
+        data = cursor.fetchall()
+        cursor.close()
+        db.close()
+        return {"column_names": column_names, "inside_data": data}  # Return both column names and data
+    except Exception as e:
+        print(f"Error retrieving data: {str(e)}")
+        return {"message": "Error retrieving data."}
+
+# Endpoint to search for data in a specific table (modify based on your search criteria)
+@app.get("/tables/{table_name}/search")
+async def search_table_data(table_name: str, search_term: str = None):
+    if not check_table_exists(table_name):
+        return {"message": f"Table '{table_name}' does not exist."}
+    if not search_term:
+        return {"message": "Please provide a search term."}
+    try:
+        db = mysql.connector.connect(**db_config)
+        cursor = db.cursor()
+        # Get column names
+        cursor.execute(f"SELECT COLUMN_NAME FROM information_schema.columns WHERE table_schema = %s AND table_name = %s", (db_config['database'], table_name))
+        column_names = [row[0] for row in cursor.fetchall()]
+
+        # Modify this query to filter data based on your search criteria
+        cursor.execute(f"SELECT * FROM {table_name} WHERE mssv LIKE %s", (f"%{search_term}%",))
+        data = cursor.fetchall()
+        cursor.close()
+        db.close()
+        return {"column_names": column_names, "inside_data": data}  # Return both column names and data
+    except Exception as e:
+        print(f"Error retrieving data: {str(e)}")
+        return {"message": "Error retrieving data."}
+
+
+@app.post("/tables/scan")
+async def create_table_proceed(request: Request):
+    try:
+        result = subprocess.run(["sh", "./src/BRS/runScanner.sh"], stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    except Exception as e:
+        return {"message": f"Error running command: {str(e)}."}
+    
+    image = cv2.imread("data/scanned_data/doc_1.png")
+    image = imutils.resize(image, width=2000)
+
+    result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=False)
+
+    cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', aligned)
+    
+    return templates.TemplateResponse("extract_info.html", {"request": request, "imagePath": 'public/img/temp_img.jpg', "jsonData": result})
 
 
 # Run the application (optional, for development purposes)
