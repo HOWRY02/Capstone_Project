@@ -320,9 +320,14 @@ def draw_boxes(image, boxes):
     Output: the image
     """
     new_image = image.copy()
-    for i in range(len(boxes)):
-        box = np.int32(boxes[i])
-        cv2.polylines(new_image, [box], True, (255,0,0), 1)
+    if np.shape(boxes[0]) == (4,2):
+        for i in range(len(boxes)):
+            box = np.int32(boxes[i])
+            cv2.polylines(new_image, [box], True, (255,0,0), 1)
+    else:
+        for i in range(len(boxes)):
+            x1, y1, x2, y2 = boxes[i]
+            cv2.rectangle(new_image, (x1, y1), (x2, y2), (255,0,0), 1)
 
     return new_image
 
@@ -631,38 +636,11 @@ def find_text_in_big_box(detector, recognizer, image):
 
         text = ' '.join(recognition)
     else:
-        # cropped_image = Image.fromarray(image)
-        # rec_result = recognizer.recognize(cropped_image)
-        # text = rec_result
         text = ''
 
     return text
 
 def format_data_dict(data_dict):
-    '''
-    element = {
-        "box": [
-            770,
-            1519,
-            1456,
-            1564
-        ],
-        "text": "ngay_tao_don",
-        "class": "date",
-        "answer_text": [
-            {
-                "box": [
-                    770,
-                    1519,
-                    1456,
-                    1564
-                ],
-                "text": "",
-                "class": "answer"
-            }
-        ]
-    }
-    '''
     # find class table
     table_area = {'table': {'box':[]}}
     for value_template in data_dict:
@@ -690,6 +668,11 @@ def format_data_dict(data_dict):
                 element = value_template
                 if value_template['class'] == 'question':
                     element['answer_text'] = [data_dict[i+1]]
+                elif value_template['class'] == 'date':
+                    date_answer = {'box': value_template['box'],
+                                   'text': '',
+                                   'class': 'answer'}
+                    element['answer_text'] = [date_answer]
                 else:
                     element['answer_text'] = []
                 result.append(element)
@@ -704,3 +687,83 @@ def format_data_dict(data_dict):
         result.append(element)
     
     return result
+
+def intersection(line1, line2):
+    """
+    Finds the intersection of two lines given in Hesse normal form.
+    Returns closest integer pixel locations.
+    """
+    rho1, theta1 = line1[0]
+    rho2, theta2 = line2[0]
+    A = np.array([
+        [np.cos(theta1), np.sin(theta1)],
+        [np.cos(theta2), np.sin(theta2)]
+    ])
+    b = np.array([[rho1], [rho2]])
+
+    x0, y0 = np.linalg.solve(A, b)
+    x0, y0 = int(np.round(x0)), int(np.round(y0))
+    return [x0, y0]
+
+    
+
+def segmented_intersections(horizontal_lines, vertical_lines):
+    """Finds the intersections between groups of lines."""
+    intersections = []
+    for h_line in horizontal_lines:
+        intersections_in_line = []
+        for v_line in vertical_lines:
+            if intersection(h_line, v_line):
+                intersections_in_line.append(intersection(h_line, v_line))
+        intersections.append(intersections_in_line)
+    return intersections
+
+def create_answer_boxes_in_table(image, table_box):
+
+    # new_image = image.copy()
+    # image = imutils.resize(new_image, width=700)
+
+    xt1, yt1, xt2, yt2 = table_box[0], table_box[1], table_box[2], table_box[3]
+
+    w, h = xt2-xt1, yt2-yt1
+
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+
+    # Perform HoughLines tranform
+    lines = cv2.HoughLines(thresh,1,np.pi/180,500)
+    horizontal_lines = []
+    vertical_lines = []
+    for line in lines:
+        # for rho,theta in line:
+        rho, theta = line[0]
+        a = np.cos(theta)
+        b = np.sin(theta)
+        x0 = a*rho
+        y0 = b*rho
+        x1 = int(x0 + 3000*(-b))
+        y1 = int(y0 + 3000*(a))
+        x2 = int(x0 - 3000*(-b))
+        y2 = int(y0 - 3000*(a))
+
+        if y1 <= (yt2 - h*0.04) and y1 > (yt1 + h*0.04):
+            horizontal_lines.append(line)
+
+        if x1 <= (xt2 - w*0.04) and x1 > (xt1 + w*0.04):
+            vertical_lines.append(line)
+
+    horizontal_lines.append(np.array([[yt2, 1.5708]], dtype=float))
+    vertical_lines.append(np.array([[xt2, 0]], dtype=float))
+
+    intersections = segmented_intersections(horizontal_lines, vertical_lines)
+    for point_in_line in intersections:
+        point_in_line.sort(key = lambda x: x[0])
+    print(intersections)
+    intersections.sort(key = lambda x: (x[0][1], x[0][0]))
+    print(intersections)
+    answer_boxes = []
+    for i in range(len(intersections)-1):
+        for j in range(len(intersections[i])-1):
+            answer_boxes.append(intersections[i][j]+intersections[i+1][j+1])
+
+    return answer_boxes

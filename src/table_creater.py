@@ -15,7 +15,7 @@ from src.OCR.extraction.text_extractor import TextExtractor
 from src.DOC_AI.form_understanding.form_understand import FormUnderstand
 from src.DOC_AI.layout_analysis.layout_analyzer import LayoutAnalyzer
 from src.utils.utility import preprocess_image, get_text_image, draw_layout_result, make_underscore_name
-from src.utils.utility import find_relative_position, find_text_in_big_box
+from src.utils.utility import find_text_in_big_box, create_answer_boxes_in_table
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
@@ -72,6 +72,11 @@ class TableCreater():
         # find template boxes
         for key in form_result:
             template[key]['box'] = form_result[key]['box']
+
+        # find answer boxes and texts in table
+        if len(layout_result['table']['box']) > 0:
+            template['answer']['box'] = create_answer_boxes_in_table(image, layout_result['table']['box'][0])
+            template['answer']['text'] = ['' for _ in template['answer']['box']]
 
         # find template texts
         for key in template:
