@@ -91,7 +91,6 @@ function draw() {
     ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
     ctx.drawImage(img, 0, 0, img.width, img.height);
 
-    // boxes.forEach((loc, index) => {
     for (let i = 0; i < boxes.length; i++) {
         for (let j = 0; j < boxes[i].length; j++) {
             let box = boxes[i][j];
@@ -148,16 +147,13 @@ function draw() {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx.fillRect(resizingBox.startX, resizingBox.startY, resizingBox.width, resizingBox.height);
     }
-    
+
+    // Display data
     displayFields(boxes);
-    console.log(boxes)
     
     // Display the ocr results
     const boxesToSave = formatBoxesToSave(boxes);
     document.getElementById('templateDisplay').textContent = JSON.stringify(boxesToSave);
-    console.log(document.getElementById('templateDisplay').textContent)
-    // Display data
-    
 }
 
 // Function to remove boxes with absolute height or width < 0.5

@@ -123,6 +123,7 @@ function draw() {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx.fillRect(resizingBox.startX, resizingBox.startY, resizingBox.width, resizingBox.height);
     }
+
     const boxesToSave = formatBoxesToSave(boxes);
     document.getElementById('templateDisplay').textContent = JSON.stringify(boxesToSave);
 }
@@ -174,19 +175,6 @@ function findHandle(x, y) {
             bottomRightY = box.startY + box.height;
         }
 
-        // // Calculate the center of the box
-        // const centerX = bottomRightX;
-        // const centerY = bottomRightY;
-
-        // // Calculate the distance between the mouse pointer and the center of the box
-        // const distX = x - centerX;
-        // const distY = y - centerY;
-        // const distance = Math.sqrt(distX * distX + distY * distY);
-
-        // // If the distance is within a threshold (6 in this case), consider it a resize handle
-        // if (distance <= 6) {
-        //     return { type: 'resize', boxIndex: i }; // Return resize handle type and box index
-        // }
         // Calculate the center of the box
         const dragPointX = topLeftX;
         const dragPointY = topLeftY;
