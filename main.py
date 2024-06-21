@@ -1,13 +1,12 @@
 import os
 import cv2
-import yaml
 import json
 import imutils
 import uvicorn
 import subprocess
 import mysql.connector
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends, File, UploadFile, Request, HTTPException
+from fastapi import FastAPI, File, UploadFile, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
@@ -16,9 +15,6 @@ from src.table_creater import TableCreater
 from src.info_extracter import InfoExtracter
 from src.utils.utility import load_image, find_relative_position, format_data_dict
 
-with open("./config/doc_config.yaml", "r") as f:
-    doc_config = yaml.safe_load(f)
-STATUS = doc_config["status"]
 
 app = FastAPI(title='Template Creater')
 
@@ -68,13 +64,19 @@ async def root(request: Request):
 @app.get("/creatingTable")
 async def creatingTableHome(request: Request):
     template = []
-    return templates.TemplateResponse("create_table.html", {"request": request, "imagePath": 'public/img/init_img.jpg', "jsonData": template})
+    scale_factor = 1.0
+    return templates.TemplateResponse("create_table.html", {"request": request,
+                                                            "imagePath": 'public/img/init_img.jpg',
+                                                            "jsonData": template,
+                                                            "scaleFactor": scale_factor})
 
 
 @app.get("/extractingInfo")
 async def extractingInfoHome(request: Request):
     template = []
-    return templates.TemplateResponse("extract_info.html", {"request": request, "imagePath": 'public/img/init_img.jpg', "jsonData": template})
+    return templates.TemplateResponse("extract_info.html", {"request": request,
+                                                            "imagePath": 'public/img/init_img.jpg',
+                                                            "jsonData": template})
 
 
 @app.get("/showingData")
@@ -82,30 +84,59 @@ async def extractingInfoHome(request: Request):
     return templates.TemplateResponse("show_data.html", {"request": request})
 
 
+def scale_box(template: list, scale_factor):
+    new_template = template.copy()
+    for i in range(len(new_template)):
+        box = [int(x * scale_factor) for x in new_template[i]['box']]
+        new_template[i]['box'] = box
+        if 'answer_text' in new_template[i].keys():
+            for answer_element in new_template[i]['answer_text']:
+                answer_box = [int(x * scale_factor) for x in answer_element['box']]
+                answer_element['box'] = answer_box
+
+    return new_template
+
 @app.post("/creatingTable/rec")
 async def creatingTable(request: Request,
                         imageInput: UploadFile = File()):
-
+    global scale_factor
     image = load_image(imageInput.file)
-    # image = imutils.resize(image, width=2000)
-    template, status_code, [] = table_creater.create_table(image, is_visualize=True)
+    template, status_code, [] = table_creater.create_table(image, is_visualize=False)
 
+    # save the raw image
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', image)
+    # save the resized image
+    scale_factor = 1000 / image.shape[1]
+    resized_img = imutils.resize(image, width=1000)
+    cv2.imwrite(f'src/WEB/public/img/resized_img.jpg', resized_img)
+    # apply scale factor for display on the web
+    template = scale_box(template, scale_factor)
 
-    return templates.TemplateResponse("create_table.html", {"request": request, "imagePath": 'public/img/temp_img.jpg', "jsonData": template})
+    return templates.TemplateResponse("create_table.html", {"request": request,
+                                                            "imagePath": 'public/img/resized_img.jpg',
+                                                            "jsonData": template,
+                                                            "scaleFactor": scale_factor})
 
 
 @app.post("/extractingInfo/rec")
 async def extractingInfo(request: Request,
                          imageInput: UploadFile = File()):
-    
+    global scale_factor
     image = load_image(imageInput.file)
-    # image = imutils.resize(image, width=2000)
-    result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)
+    result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=False)
 
+    # save the aligned image
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', aligned)
-    
-    return templates.TemplateResponse("extract_info.html", {"request": request, "imagePath": 'public/img/temp_img.jpg', "jsonData": result})
+    # save the resized image
+    scale_factor = 1000 / aligned.shape[1]
+    resized_img = imutils.resize(aligned, width=1000)
+    cv2.imwrite(f'src/WEB/public/img/resized_img.jpg', resized_img)
+    # apply scale factor for display on the web
+    result = scale_box(result, scale_factor)
+
+    return templates.TemplateResponse("extract_info.html", {"request": request,
+                                                            "imagePath": 'public/img/resized_img.jpg',
+                                                            "jsonData": result})
 
 
 @app.post("/confirm_and_create_table")
@@ -122,6 +153,7 @@ async def confirm_and_create_table(table_name: str):
 async def create_table_proceed(data: JSONData):
     try:
         data_dict = json.loads(data.data)
+        data_dict = scale_box(data_dict, 1/scale_factor)
         # sort data_dict
         data_dict.sort(key = lambda x: x['box'][1])
 
@@ -171,6 +203,7 @@ async def create_table_proceed(data: JSONData):
 async def insert_data(data: JSONData):
     try:
         data_dict = json.loads(data.data)
+        data_dict = scale_box(data_dict, 1/scale_factor)
 
         # Filter JSON data for items where class is "text"
         text_columns = [item['text'] for item in data_dict if (item['class'] == 'question' or item['class'] == 'date')]
@@ -197,7 +230,7 @@ async def insert_data(data: JSONData):
 
     
 # Define the path to the mapping.json file
-json_file_path = "src/WEB/resources/script/create_table/mapping.json"
+json_file_path = "config/mapping.json"
 # Fast api endpoint to retrieve mapping.json and return the json object using get
 @app.get("/get-mapping", response_class=JSONResponse)
 async def get_mapping():
@@ -250,7 +283,7 @@ async def get_table_data(table_name: str):
         print(f"Error retrieving data: {str(e)}")
         return {"message": "Error retrieving data."}
 
-# Endpoint to search for data in a specific table (modify based on your search criteria)
+
 @app.get("/tables/{table_name}/search")
 async def search_table_data(table_name: str, search_term: str = None):
     if not check_table_exists(table_name):

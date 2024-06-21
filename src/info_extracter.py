@@ -5,7 +5,6 @@ import json
 import time
 import yaml
 import copy
-import logging
 from PIL import Image
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -21,8 +20,6 @@ with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
 STATUS = doc_config["status"]
 
-logging.getLogger().setLevel(logging.ERROR)
-os.environ['CURL_CA_BUNDLE'] = ''
 
 class InfoExtracter():
     __instance__ = None
@@ -51,6 +48,7 @@ class InfoExtracter():
         Input: input image
         Output: template image, template json file
         """
+        print(image.shape)
         start_time = time.time()
         status_code = "200"
         
@@ -116,7 +114,7 @@ class InfoExtracter():
                 answer.pop('temp_box', None)
 
             result.append(loc)
-        # print(result)
+
         if is_visualize:
             layout_img = draw_layout_result(image, layout_document, box_width=2, box_alpha=0.1)
             cv2.imwrite('result/layout_img.jpg', layout_img)

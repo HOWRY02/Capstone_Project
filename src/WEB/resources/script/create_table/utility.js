@@ -1,12 +1,5 @@
 // Function to adjust the size of input elements based on imageCanvas size
 function adjustInputElementsSize() {
-    const canvasRect = imageCanvas.getBoundingClientRect();
-    const canvasWidth = canvasRect.width;
-    const canvasHeight = canvasRect.height;
-
-    // Calculate the scaled size for input elements
-    const scaleFactor = Math.min(canvasWidth, canvasHeight) / 400; // Adjust according to your requirements
-
     const inputText = document.getElementById('textInput');
     inputText.style.fontSize = `${scaleFactor * 16}px`; // Adjust font size based on canvas size
 
@@ -16,39 +9,15 @@ function adjustInputElementsSize() {
     const buttons = document.querySelectorAll('input[type="file"], #saveButton, #createButton');
     buttons.forEach(button => {
         button.style.fontSize = `${scaleFactor * 14}px`; // Adjust button font size
-        button.style.padding = `${scaleFactor * 8}px ${scaleFactor * 16}px`; // Adjust button padding
+        button.style.padding = `${scaleFactor * 4}px ${scaleFactor * 8}px`; // Adjust button padding
     });
 
     // Adjust padding for question and title buttonz
-    const button_class = document.querySelectorAll('#submitButton, #questionButton, #answerButton, #titleButton, #dateButton, #tableButton');
+    const button_class = document.querySelectorAll('#homeButton, #extractButton, #submitButton, #questionButton, #answerButton, #titleButton, #dateButton, #tableButton');
     button_class.forEach(button => {
         button.style.fontSize = `${scaleFactor * 12}px`; // Adjust button font size
         button.style.padding = `${scaleFactor * 6}px ${scaleFactor * 13}px`; // Adjust button padding
     });
-
-    // Adjust for homeButton and extractButton
-    // Get references to the buttons
-    const homeButton = document.getElementById('homeButton');
-    const extractButton = document.getElementById('extractButton');
-    const menuBar = document.getElementsByClassName('menuBar');
-    // Apply styles using JavaScript
-    homeButton.style.fontSize = `${scaleFactor * 12}px`;
-    homeButton.style.border = 'none';
-    homeButton.style.cursor = 'pointer';
-    homeButton.style.backgroundColor = '#0a0a23';
-    homeButton.style.color = '#fff';
-    // homeButton.style.marginRight = 'auto'; // Pushes the button to the left
-
-
-    extractButton.style.fontSize = `${scaleFactor * 12}px`;
-    extractButton.style.border = 'none';
-    extractButton.style.cursor = 'pointer';
-    extractButton.style.backgroundColor = '#0a0a23';
-    extractButton.style.color = '#fff';
-
-    // menuBar.style.marginBottom = 'auto';
-
-
 }
 
 function delareImage() {
@@ -62,7 +31,7 @@ function delareImage() {
     imageCanvas.width = img.width;
     imageCanvas.height = img.height;
 
-    adjustInputElementsSize(imageCanvas); // Call function to adjust input elements size
+    adjustInputElementsSize(); // Call function to adjust input elements size
 }
 
 function draw() {
@@ -263,6 +232,8 @@ function formatBoxesToSave(boxes) {
 
 // Function to load boxes data from a JSON file
 function loadBoxes(event) {
+    
+    deleteAllBoxes()
     const file = event.target.files[0]; // Get the selected file
 
     if (file) {
@@ -270,26 +241,25 @@ function loadBoxes(event) {
 
         reader.onload = function (e) {
             const loadedData = JSON.parse(e.target.result); // Parse loaded JSON data
-
             // Load boxes with their associated text from the loaded data
             boxes = loadedData.map(data => ({
-                startX: Math.round(data.box[2]),
-                startY: Math.round(data.box[3]),
-                width: Math.round(data.box[0] - data.box[2]),
-                height: Math.round(data.box[1] - data.box[3]),
+                startX: Math.round(data.box[2]*ratio),
+                startY: Math.round(data.box[3]*ratio),
+                width: Math.round((data.box[0] - data.box[2])*ratio),
+                height: Math.round((data.box[1] - data.box[3])*ratio),
                 text: data.text || '', // Ensure text property exists or set it to an empty string
                 class: data.class
             }));
 
             for (const dataTemp of loadedData) {
                 answer_boxes = answer_boxes.concat(dataTemp.answer_text.map(data => ({
-                startX: data.box[2],
-                startY: data.box[3],
-                width: data.box[0] - data.box[2],
-                height: data.box[1] - data.box[3],
-                text: data.text || '', // Ensure text property exists or set it to an empty string
-                class: data.class
-            })));
+                    startX: Math.round(data.box[2]*ratio),
+                    startY: Math.round(data.box[3]*ratio),
+                    width: Math.round((data.box[0] - data.box[2])*ratio),
+                    height: Math.round((data.box[1] - data.box[3])*ratio),
+                    text: data.text || '', // Ensure text property exists or set it to an empty string
+                    class: data.class
+                })));
             }
 
             boxes = boxes.concat(answer_boxes)

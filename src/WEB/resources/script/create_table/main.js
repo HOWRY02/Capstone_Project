@@ -5,6 +5,8 @@ const formImage = document.getElementById("formImage");
 const imgSrc = formImage.src;
 const boxesString = document.getElementById("hiddenJsonData").textContent.replace(/'/g, '"');
 const boxesTemp = JSON.parse(boxesString);
+const initRatioString = document.getElementById("hiddenScaleFactor").textContent;
+const initRatio = parseFloat(initRatioString)
 const removeThreshold = 5;
 
 const loadInput = document.getElementById('loadInput');
@@ -37,6 +39,9 @@ let colorAnswer = 'purple';
 let colorDate = 'blue';
 let colorTable = 'yellow';
 let currentColor = colorTitle;
+let ratio = initRatio;
+const WIDTH = 1000;
+const scaleFactor = 1.5039999389648437;
 
 tempImg = new Image();
 tempImg.onload = function () {
@@ -70,30 +75,39 @@ imageInput.addEventListener('change', function (event) {
     if (file) {
         // Creating a new instance of FileReader
         const reader = new FileReader();
-
-        // Event triggered when FileReader finishes reading the file
-        reader.onload = function (e) {
-            // Creating a new Image object
-            imgFile = new Image();
-
-            // Event triggered when the image has finished loading
-            imgFile.onload = function () {
-                // Setting the canvas dimensions to match the loaded image
-                imageCanvas.width = imgFile.width;
-                imageCanvas.height = imgFile.height;
-
-                adjustInputElementsSize(); // Call function to adjust input elements size
-                // Drawing the image on the canvas
-                ctx.drawImage(imgFile, 0, 0, imgFile.width, imgFile.height);
-            };
-
-            // Setting the source of the image to the result of FileReader
-            imgFile.src = e.target.result;
-            realImgSrc = imgFile.src;
-        };
-
         // Reading the selected file as a data URL
         reader.readAsDataURL(file);
+        // Event triggered when FileReader finishes reading the file
+        reader.onload = function (e) {
+            // append new image to the "image-container"
+            let image = document.createElement("img");
+            image_url = e.target.result;
+            image.src = image_url;
+           
+
+            // Event triggered when the image has finished loading
+            image.onload = function (e) {
+                // Resize image
+                imageCanvas.width = WIDTH;
+                // let aspect ratio of the image
+                ratio = WIDTH / e.target.width;
+                imageCanvas.height = e.target.height * ratio;
+
+                // Draw image on the canvas
+                ctx.drawImage(image, 0, 0, imageCanvas.width, imageCanvas.height);
+                
+                // display the resized image on the canvas
+                let new_image_url = ctx.canvas.toDataURL("image/jpeg", 100);
+                let new_image = document.createElement("img");
+                new_image.src = new_image_url;
+                realImgSrc = new_image_url;
+                imgSrc = new_image_url;
+                // document.getElementsByClassName("image-container").appendChild(new_image);
+                adjustInputElementsSize();
+
+            };
+        };
+
         isSubmiting = false;
     }
 });

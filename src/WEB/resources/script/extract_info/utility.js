@@ -1,12 +1,5 @@
 // Function to adjust the size of input elements based on imageCanvas size
 function adjustInputElementsSize() {
-    const canvasRect = imageCanvas.getBoundingClientRect();
-    const canvasWidth = canvasRect.width;
-    const canvasHeight = canvasRect.height;
-
-    // Calculate the scaled size for input elements
-    const scaleFactor = Math.min(canvasWidth, canvasHeight) / 400; // Adjust according to your requirements
-
     const inputText = document.getElementById('textInput');
     inputText.style.fontSize = `${scaleFactor * 16}px`; // Adjust font size based on canvas size
 
@@ -15,7 +8,7 @@ function adjustInputElementsSize() {
 
     const buttons = document.querySelectorAll('input[type="file"], #updateButton');
     buttons.forEach(button => {
-        button.style.fontSize = `${scaleFactor * 7}px`; // Adjust button font size 14
+        button.style.fontSize = `${scaleFactor * 14}px`; // Adjust button font size 14
         button.style.padding = `${scaleFactor * 4}px ${scaleFactor * 8}px`; // Adjust button padding 8
     });
 

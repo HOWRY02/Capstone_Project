@@ -18,7 +18,6 @@ async function fetchMappingData() {
     }
 }
 mapping = fetchMappingData()
-console.log(mapping)
 
 async function displayFields(boxes) {
     // Select the resultHeading for adjust the font size
@@ -54,6 +53,7 @@ async function displayFields(boxes) {
         const listItem = document.createElement('li');
         const map = await mapping;
         listItem.textContent = map[item.text] || "Key not found in mapping";
+        // listItem.textContent = item.text || "Key not found in mapping";
         if (listItem.textContent == "Key not found in mapping") {
             listItem.textContent = item.text;
         }
@@ -77,13 +77,11 @@ async function displayFields(boxes) {
 // Function to handle the event
 async function handleEvent() {
     const jsonData = document.getElementById('templateDisplay').textContent;
-    console.log(jsonData); // Check the content of jsonData
+    // console.log(jsonData); // Check the content of jsonData
 
-    try {
+    if (jsonData) {
         const parsedData = JSON.parse(jsonData); // Parse the JSON string
         displayFields(parsedData); // Pass the parsed array to displayFields
-    } catch (error) {
-        console.error('Error parsing JSON:', error);
     }
 }
 

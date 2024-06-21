@@ -3,8 +3,6 @@ import cv2
 import sys
 import time
 import yaml
-import logging
-from PIL import Image
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
@@ -21,8 +19,6 @@ with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
 STATUS = doc_config["status"]
 
-logging.getLogger().setLevel(logging.ERROR)
-os.environ['CURL_CA_BUNDLE'] = ''
 
 class TableCreater():
     __instance__ = None
@@ -51,6 +47,7 @@ class TableCreater():
         Input: input image
         Output: result image, result json file
         """
+        print(image.shape)
         start_time = time.time()
         status_code = "200"
 
@@ -115,7 +112,7 @@ class TableCreater():
 
 if __name__ == "__main__":
 
-    img_path = "data_form/don_mien_thi.png"
+    img_path = "data/scanned_data_form/1200_DPI_PNG_RISIZED/don_xin_mien_thi.png"
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     table_creater = TableCreater()
     template_json, status_code, [] = table_creater.create_table(image)
