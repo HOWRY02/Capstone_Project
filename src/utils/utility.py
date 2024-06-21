@@ -65,6 +65,9 @@ def vconcat_2_images(image1, image2):
     result_img = cv2.vconcat([image1, image2])
     return result_img
 
+def flatten_comprehension(matrix):
+    return [item for row in matrix for item in row]
+
 def config_form_name_list():
     with open('config/form_name_list.yaml') as yaml_file:
         form_name_list = yaml.safe_load(yaml_file)
