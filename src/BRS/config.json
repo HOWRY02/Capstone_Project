@@ -1,0 +1,14 @@
+{
+  "resolution": 300,
+  "scan_area": {
+    "width": 210,
+    "height": 297
+  },
+  "folder_name": "Scans",
+  "file_name": "scan_{timestamp}.jpg",
+  "ip": "192.168.1.100",
+  "contrast": 75,
+  "mode": "color",
+  "format": "png"
+}
+
