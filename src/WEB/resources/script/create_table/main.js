@@ -5,6 +5,8 @@ const formImage = document.getElementById("formImage");
 const imgSrc = formImage.src;
 const boxesString = document.getElementById("hiddenJsonData").textContent.replace(/'/g, '"');
 const boxesTemp = JSON.parse(boxesString);
+const initRatioString = document.getElementById("hiddenScaleFactor").textContent;
+const initRatio = parseFloat(initRatioString)
 const removeThreshold = 5;
 
 const loadInput = document.getElementById('loadInput');
@@ -13,6 +15,7 @@ const titleButton = document.getElementById('titleButton');
 const questionButton = document.getElementById('questionButton');
 const answerButton = document.getElementById('answerButton');
 const dateButton = document.getElementById('dateButton');
+const tableButton = document.getElementById('tableButton');
 const submitButton = document.getElementById('submitButton');
 const textInput = document.getElementById('textInput');
 const createButton = document.getElementById('createButton');
@@ -24,6 +27,7 @@ let isDragging = false; // Flag to track dragging action
 let mouseX, mouseY;
 let selectedBox = null;
 let boxes = []; // Array to store box coordinates
+let answer_boxes = [];
 let resizingBox = null; // Variable to track the box being resized
 let isResizing = false; // Flag to track resize status
 
@@ -33,7 +37,11 @@ let colorTitle = 'red';
 let colorQuestion = 'green';
 let colorAnswer = 'purple';
 let colorDate = 'blue';
+let colorTable = 'yellow';
 let currentColor = colorTitle;
+let ratio = initRatio;
+const WIDTH = 1000;
+const scaleFactor = 1.5039999389648437;
 
 tempImg = new Image();
 tempImg.onload = function () {
@@ -67,30 +75,39 @@ imageInput.addEventListener('change', function (event) {
     if (file) {
         // Creating a new instance of FileReader
         const reader = new FileReader();
-
-        // Event triggered when FileReader finishes reading the file
-        reader.onload = function (e) {
-            // Creating a new Image object
-            imgFile = new Image();
-
-            // Event triggered when the image has finished loading
-            imgFile.onload = function () {
-                // Setting the canvas dimensions to match the loaded image
-                imageCanvas.width = imgFile.width;
-                imageCanvas.height = imgFile.height;
-
-                adjustInputElementsSize(); // Call function to adjust input elements size
-                // Drawing the image on the canvas
-                ctx.drawImage(imgFile, 0, 0, imgFile.width, imgFile.height);
-            };
-
-            // Setting the source of the image to the result of FileReader
-            imgFile.src = e.target.result;
-            realImgSrc = imgFile.src;
-        };
-
         // Reading the selected file as a data URL
         reader.readAsDataURL(file);
+        // Event triggered when FileReader finishes reading the file
+        reader.onload = function (e) {
+            // append new image to the "image-container"
+            let image = document.createElement("img");
+            image_url = e.target.result;
+            image.src = image_url;
+           
+
+            // Event triggered when the image has finished loading
+            image.onload = function (e) {
+                // Resize image
+                imageCanvas.width = WIDTH;
+                // let aspect ratio of the image
+                ratio = WIDTH / e.target.width;
+                imageCanvas.height = e.target.height * ratio;
+
+                // Draw image on the canvas
+                ctx.drawImage(image, 0, 0, imageCanvas.width, imageCanvas.height);
+                
+                // display the resized image on the canvas
+                let new_image_url = ctx.canvas.toDataURL("image/jpeg", 100);
+                let new_image = document.createElement("img");
+                new_image.src = new_image_url;
+                realImgSrc = new_image_url;
+                imgSrc = new_image_url;
+                // document.getElementsByClassName("image-container").appendChild(new_image);
+                adjustInputElementsSize();
+
+            };
+        };
+
         isSubmiting = false;
     }
 });
@@ -117,22 +134,24 @@ imageCanvas.addEventListener('mousedown', (e) => {
     } else if (type === 'drag') {
         // If a drag action is detected
         isDragging = true;
+        isResizing = false;
         selectedBox = boxes[boxIndex]; // Selecting the box to be dragged
     } else {
         // If neither resize nor drag action is detected
-        if (selectedBox !== null && selectedBox === boxes[boxIndex]) {
+        if (selectedBox === boxes[boxIndex]) {
             // If the clicked box is already selected, deselect it
             selectedBox = null;
         } else {
             // If a new box creation action is detected
-            isDragging = true;
+            isResizing = true;
             // Creating a new box at the clicked position with initial dimensions
             const box = {
                 startX: Math.round(mouseX), startY: Math.round(mouseY),
-                width: 0, height: 0, class: currentMode
+                width: 0, height: 0, text: '', class: currentMode
             };
             boxes.push(box); // Adding the new box to the boxes array
-            selectedBox = box; // Setting the newly created box as selected
+            resizingBox = box;
+            selectedBox = resizingBox; // Setting the newly created box as selected
         }
     }
     draw();
@@ -147,24 +166,20 @@ imageCanvas.addEventListener('mousemove', (e) => {
     mouseX = e.clientX - rect.left;
     mouseY = e.clientY - rect.top;
 
-    // Checking if dragging action is ongoing
-    if (isDragging) {
-        // Handling box movement or resizing based on the action type
-        if (selectedBox !== null && !isResizing) {
-            // If dragging a box (not resizing)
-            const dx = mouseX - selectedBox.startX;
-            const dy = mouseY - selectedBox.startY;
-
+    // Handling box movement or resizing based on the action type
+    if (selectedBox !== null) {
+        if (isDragging && selectedBox !== null) {
             // Updating box position and dimensions based on mouse movement
-            selectedBox.startX = Math.round(mouseX);
-            selectedBox.startY = Math.round(mouseY);
-            selectedBox.width -= Math.round(dx);
-            selectedBox.height -= Math.round(dy);
+            selectedBox.startX = Math.round(mouseX - selectedBox.width);
+            selectedBox.startY = Math.round(mouseY - selectedBox.height);
         } else if (isResizing && resizingBox !== null) {
-            // If resizing a box
-            // Calculating and updating the resized box dimensions based on mouse movement
-            resizingBox.width = Math.round(Math.max(0, mouseX - resizingBox.startX));
-            resizingBox.height = Math.round(Math.max(0, mouseY - resizingBox.startY));
+            const dx = mouseX - resizingBox.startX;
+            const dy = mouseY - resizingBox.startY;
+            // Updating box position and dimensions based on mouse movement
+            resizingBox.startX = Math.round(mouseX);
+            resizingBox.startY = Math.round(mouseY);
+            resizingBox.width -= Math.round(dx);
+            resizingBox.height -= Math.round(dy);
         }
         draw();
     }
@@ -192,21 +207,6 @@ imageCanvas.addEventListener('mouseup', () => {
 // Function to handle the contextmenu event on the imageCanvas
 imageCanvas.addEventListener('contextmenu', (e) => {
     e.preventDefault(); // Prevent the default context menu from appearing
-
-    // Get the position of the mouse relative to the imageCanvas
-    const rect = imageCanvas.getBoundingClientRect();
-    mouseX = e.clientX - rect.left;
-    mouseY = e.clientY - rect.top;
-
-    // Find the index of the box at the clicked position
-    const boxIndex = findBox(mouseX, mouseY);
-
-    // If a box exists at the clicked position
-    if (boxIndex !== -1) {
-        // Remove the box from the boxes array
-        boxes.splice(boxIndex, 1);
-        draw();
-    }
 });
 
 // Function to handle keydown events
@@ -256,6 +256,11 @@ answerButton.addEventListener('click', function () {
 // Event listener for the 'Question Mode' button
 dateButton.addEventListener('click', function () {
     setMode('date', colorDate); // Set mode to 'date' with violet color
+});
+
+// Event listener for the 'Question Mode' button
+tableButton.addEventListener('click', function () {
+    setMode('table', colorTable); // Set mode to 'date' with violet color
 });
 
 // Event listener for the text input field to update box text on pressing Enter

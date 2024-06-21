@@ -1,11 +1,11 @@
 form_name:
-- đơn xin miễn thi
-- đơn xin bảo lưu điểm
-- đơn xin cấp bản sao từ sổ gốc bằng tốt nghiệp
-- đơn xin chuyển điểm
-- đơn xin chuyển điểm ngoại ngữ
-- đơn xin xét chuyển trình độ đào tạo
-- đơn xin học môn thay thế
-- đơn xin miễn thi anh văn đầu ra
-- đơn xin nhận điểm i (điểm chưa hoàn tất)
-- đơn xin phép nghỉ học
+    - đơn xin miễn thi
+    - đơn xin bảo lưu điểm
+    - đơn xin cấp bản sao từ sổ gốc bằng tốt nghiệp
+    - đơn xin chuyển điểm
+    - đơn xin chuyển điểm ngoại ngữ
+    - đơn xin xét chuyển trình độ đào tạo
+    - đơn xin học môn thay thế
+    - đơn xin miễn thi anh văn đầu ra
+    - đơn xin nhận điểm i (điểm chưa hoàn tất)
+    - đơn xin phép nghỉ học

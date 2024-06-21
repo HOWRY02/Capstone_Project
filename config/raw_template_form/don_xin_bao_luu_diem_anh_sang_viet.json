@@ -1,1 +1,1393 @@
-[{"box": [571, 280, 1088, 332], "text": "don_xin_bao_luu_diem_anh_sang_viet", "class": "title"}, {"box": [188, 408, 435, 456], "text": "ho_ten", "class": "question"}, {"box": [438, 408, 924, 456], "text": "", "class": "answer"}, {"box": [924, 408, 1095, 456], "text": "dien_thoai", "class": "question"}, {"box": [1098, 408, 1456, 456], "text": "", "class": "answer"}, {"box": [188, 473, 423, 520], "text": "mssv", "class": "question"}, {"box": [430, 473, 648, 520], "text": "", "class": "answer"}, {"box": [641, 473, 714, 520], "text": "lop", "class": "question"}, {"box": [722, 473, 930, 520], "text": "", "class": "answer"}, {"box": [932, 473, 1027, 520], "text": "khoa", "class": "question"}, {"box": [1030, 473, 1458, 520], "text": "", "class": "answer"}, {"box": [185, 530, 405, 582], "text": "lop_cu_da_hoc", "class": "question"}, {"box": [408, 530, 926, 582], "text": "", "class": "answer"}, {"box": [929, 530, 1170, 582], "text": "ma_sinh_vien_cu", "class": "question"}, {"box": [1172, 530, 1458, 582], "text": "", "class": "answer"}, {"box": [256, 654, 477, 771], "text": "ten_mon_hoc_cu", "class": "question"}, {"box": [478, 654, 678, 771], "text": "ma_mon_hoc_cu", "class": "question"}, {"box": [677, 654, 755, 771], "text": "so_tin_chi_cu", "class": "question"}, {"box": [754, 654, 848, 771], "text": "diem", "class": "question"}, {"box": [847, 654, 1064, 773], "text": "ten_mon_hoc_dang_hoc", "class": "question"}, {"box": [1064, 654, 1262, 773], "text": "ma_mon_hoc_dang_hoc", "class": "question"}, {"box": [1262, 654, 1336, 773], "text": "so_tin_chi_dang_hoc", "class": "question"}, {"box": [264, 836, 478, 1804], "text": "", "class": "answer"}, {"box": [478, 836, 678, 1804], "text": "", "class": "answer"}, {"box": [680, 836, 754, 1804], "text": "", "class": "answer"}, {"box": [756, 836, 854, 1804], "text": "", "class": "answer"}, {"box": [854, 836, 1066, 1804], "text": "", "class": "answer"}, {"box": [1068, 836, 1260, 1804], "text": "", "class": "answer"}, {"box": [1264, 836, 1344, 1804], "text": "", "class": "answer"}, {"box": [820, 1953, 1456, 2001], "text": "ngay_tao_don", "class": "date"}]
+[
+    {
+        "box": [
+            678,
+            350,
+            1277,
+            410
+        ],
+        "text": "don_xin_bao_luu_diem_anh_sang_viet",
+        "class": "title",
+        "answer_text": []
+    },
+    {
+        "box": [
+            238,
+            500,
+            516,
+            558
+        ],
+        "text": "ho_ten",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    518,
+                    500,
+                    1100,
+                    558
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1102,
+            500,
+            1282,
+            558
+        ],
+        "text": "dien_thoai",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1284,
+                    500,
+                    1698,
+                    558
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            238,
+            568,
+            508,
+            628
+        ],
+        "text": "mssv",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    510,
+                    568,
+                    772,
+                    628
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            772,
+            568,
+            842,
+            628
+        ],
+        "text": "lop",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    846,
+                    568,
+                    1104,
+                    628
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1106,
+            568,
+            1202,
+            628
+        ],
+        "text": "khoa",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1202,
+                    568,
+                    1698,
+                    628
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            239,
+            642,
+            484,
+            698
+        ],
+        "text": "lop_cu_da_hoc",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    486,
+                    642,
+                    1104,
+                    698
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1102,
+            642,
+            1376,
+            698
+        ],
+        "text": "ma_sinh_vien_cu",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1374,
+                    642,
+                    1698,
+                    698
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            978,
+            2288,
+            1700,
+            2344
+        ],
+        "text": "ngay_tao_don",
+        "class": "date",
+        "answer_text": [
+            {
+                "box": [
+                    978,
+                    2288,
+                    1700,
+                    2344
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            316,
+            786,
+            570,
+            888
+        ],
+        "text": "ten_mon_hoc_cu",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    316,
+                    993,
+                    568,
+                    1072
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1072,
+                    568,
+                    1139
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1139,
+                    568,
+                    1206
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1206,
+                    568,
+                    1275
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1275,
+                    568,
+                    1345
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1345,
+                    568,
+                    1417
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1417,
+                    568,
+                    1488
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1488,
+                    568,
+                    1555
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1555,
+                    568,
+                    1627
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1627,
+                    568,
+                    1698
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1698,
+                    568,
+                    1769
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1769,
+                    568,
+                    1836
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1836,
+                    568,
+                    1907
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1907,
+                    568,
+                    1979
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    1979,
+                    568,
+                    2049
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    316,
+                    2049,
+                    568,
+                    2116
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            571,
+            786,
+            795,
+            924
+        ],
+        "text": "ma_mon_hoc_cu",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    568,
+                    993,
+                    800,
+                    1072
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1072,
+                    800,
+                    1139
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1139,
+                    800,
+                    1206
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1206,
+                    800,
+                    1275
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1275,
+                    800,
+                    1345
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1345,
+                    800,
+                    1417
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1417,
+                    800,
+                    1488
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1488,
+                    800,
+                    1555
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1555,
+                    800,
+                    1627
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1627,
+                    800,
+                    1698
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1698,
+                    800,
+                    1769
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1769,
+                    800,
+                    1836
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1836,
+                    800,
+                    1907
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1907,
+                    800,
+                    1979
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    1979,
+                    800,
+                    2049
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    568,
+                    2049,
+                    800,
+                    2116
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            796,
+            786,
+            895,
+            924
+        ],
+        "text": "so_tin_chi_cu",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    800,
+                    993,
+                    890,
+                    1072
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1072,
+                    890,
+                    1139
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1139,
+                    890,
+                    1206
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1206,
+                    890,
+                    1275
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1275,
+                    890,
+                    1345
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1345,
+                    890,
+                    1417
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1417,
+                    890,
+                    1488
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1488,
+                    890,
+                    1555
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1555,
+                    890,
+                    1627
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1627,
+                    890,
+                    1698
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1698,
+                    890,
+                    1769
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1769,
+                    890,
+                    1836
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1836,
+                    890,
+                    1907
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1907,
+                    890,
+                    1979
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    1979,
+                    890,
+                    2049
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    800,
+                    2049,
+                    890,
+                    2116
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            892,
+            786,
+            1003,
+            924
+        ],
+        "text": "diem",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    890,
+                    993,
+                    1003,
+                    1072
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1072,
+                    1003,
+                    1139
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1139,
+                    1003,
+                    1206
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1206,
+                    1003,
+                    1275
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1275,
+                    1003,
+                    1345
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1345,
+                    1003,
+                    1417
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1417,
+                    1003,
+                    1488
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1488,
+                    1003,
+                    1555
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1555,
+                    1003,
+                    1627
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1627,
+                    1003,
+                    1698
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1698,
+                    1003,
+                    1769
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1769,
+                    1003,
+                    1836
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1836,
+                    1003,
+                    1907
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1907,
+                    1003,
+                    1979
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    1979,
+                    1003,
+                    2049
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    890,
+                    2049,
+                    1003,
+                    2116
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1001,
+            786,
+            1254,
+            924
+        ],
+        "text": "ten_mon_hoc_dang_hoc",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1003,
+                    993,
+                    1251,
+                    1072
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1072,
+                    1251,
+                    1139
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1139,
+                    1251,
+                    1206
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1206,
+                    1251,
+                    1275
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1275,
+                    1251,
+                    1345
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1345,
+                    1251,
+                    1417
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1417,
+                    1251,
+                    1488
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1488,
+                    1251,
+                    1555
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1555,
+                    1251,
+                    1627
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1627,
+                    1251,
+                    1698
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1698,
+                    1251,
+                    1769
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1769,
+                    1251,
+                    1836
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1836,
+                    1251,
+                    1907
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1907,
+                    1251,
+                    1979
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    1979,
+                    1251,
+                    2049
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1003,
+                    2049,
+                    1251,
+                    2116
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1251,
+            786,
+            1478,
+            927
+        ],
+        "text": "ma_mon_hoc_dang_hoc",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1251,
+                    993,
+                    1477,
+                    1072
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1072,
+                    1477,
+                    1139
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1139,
+                    1477,
+                    1206
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1206,
+                    1477,
+                    1275
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1275,
+                    1477,
+                    1345
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1345,
+                    1477,
+                    1417
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1417,
+                    1477,
+                    1488
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1488,
+                    1477,
+                    1555
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1555,
+                    1477,
+                    1627
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1627,
+                    1477,
+                    1698
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1698,
+                    1477,
+                    1769
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1769,
+                    1477,
+                    1836
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1836,
+                    1477,
+                    1907
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1907,
+                    1477,
+                    1979
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    1979,
+                    1477,
+                    2049
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1251,
+                    2049,
+                    1477,
+                    2116
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1478,
+            786,
+            1571,
+            927
+        ],
+        "text": "so_tin_chi",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1477,
+                    993,
+                    1571,
+                    1072
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1072,
+                    1571,
+                    1139
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1139,
+                    1571,
+                    1206
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1206,
+                    1571,
+                    1275
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1275,
+                    1571,
+                    1345
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1345,
+                    1571,
+                    1417
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1417,
+                    1571,
+                    1488
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1488,
+                    1571,
+                    1555
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1555,
+                    1571,
+                    1627
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1627,
+                    1571,
+                    1698
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1698,
+                    1571,
+                    1769
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1769,
+                    1571,
+                    1836
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1836,
+                    1571,
+                    1907
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1907,
+                    1571,
+                    1979
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    1979,
+                    1571,
+                    2049
+                ],
+                "text": "",
+                "class": "answer"
+            },
+            {
+                "box": [
+                    1477,
+                    2049,
+                    1571,
+                    2116
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    }
+]

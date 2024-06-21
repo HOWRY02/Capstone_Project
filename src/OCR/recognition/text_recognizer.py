@@ -42,7 +42,7 @@ class TextRecognizer():
             self.config['pretrain'] = 'model/recognition_model/vi_vietocr_vgg19_seq2seq/vgg_seq2seq.pth'
             self.config['weights'] = 'model/recognition_model/vi_vietocr_vgg19_seq2seq/vgg_seq2seq.pth'
             self.config['predictor']['beamsearch'] = False
-            print('Text recognition uses', self.device)
+            # print('Text recognition uses', self.device)
             self.config['device'] = self.device
             self.detector = Predictor(self.config)
 

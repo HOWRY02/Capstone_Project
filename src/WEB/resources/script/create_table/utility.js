@@ -1,12 +1,5 @@
 // Function to adjust the size of input elements based on imageCanvas size
 function adjustInputElementsSize() {
-    const canvasRect = imageCanvas.getBoundingClientRect();
-    const canvasWidth = canvasRect.width;
-    const canvasHeight = canvasRect.height;
-
-    // Calculate the scaled size for input elements
-    const scaleFactor = Math.min(canvasWidth, canvasHeight) / 400; // Adjust according to your requirements
-
     const inputText = document.getElementById('textInput');
     inputText.style.fontSize = `${scaleFactor * 16}px`; // Adjust font size based on canvas size
 
@@ -16,51 +9,16 @@ function adjustInputElementsSize() {
     const buttons = document.querySelectorAll('input[type="file"], #saveButton, #createButton');
     buttons.forEach(button => {
         button.style.fontSize = `${scaleFactor * 14}px`; // Adjust button font size
-        button.style.padding = `${scaleFactor * 8}px ${scaleFactor * 16}px`; // Adjust button padding
+        button.style.padding = `${scaleFactor * 4}px ${scaleFactor * 8}px`; // Adjust button padding
     });
 
     // Adjust padding for question and title buttonz
-    const button_class = document.querySelectorAll('#submitButton, #questionButton, #answerButton, #titleButton, #dateButton');
+    const button_class = document.querySelectorAll('#homeButton, #extractButton, #submitButton, #questionButton, #answerButton, #titleButton, #dateButton, #tableButton');
     button_class.forEach(button => {
         button.style.fontSize = `${scaleFactor * 12}px`; // Adjust button font size
         button.style.padding = `${scaleFactor * 6}px ${scaleFactor * 13}px`; // Adjust button padding
     });
-
-    // Adjust for homeButton and extractButton
-    // Get references to the buttons
-    const homeButton = document.getElementById('homeButton');
-    const extractButton = document.getElementById('extractButton');
-    const menuBar = document.getElementsByClassName('menuBar');
-    // Apply styles using JavaScript
-    homeButton.style.fontSize = `${scaleFactor * 12}px`;
-    homeButton.style.border = 'none';
-    homeButton.style.cursor = 'pointer';
-    homeButton.style.backgroundColor = '#0a0a23';
-    homeButton.style.color = '#fff';
-    // homeButton.style.marginRight = 'auto'; // Pushes the button to the left
-
-
-    extractButton.style.fontSize = `${scaleFactor * 12}px`;
-    extractButton.style.border = 'none';
-    extractButton.style.cursor = 'pointer';
-    extractButton.style.backgroundColor = '#0a0a23';
-    extractButton.style.color = '#fff';
-
-    // menuBar.style.marginBottom = 'auto';
-
-
 }
-// function drawImageScaled(img, ctx) {
-//   var canvas = ctx.canvas ;
-//   var hRatio = canvas.width  / img.width    ;
-//   var vRatio =  canvas.height / img.height  ;
-//   var ratio  = Math.min ( hRatio, vRatio );
-//   var centerShift_x = ( canvas.width - img.width*ratio ) / 2;
-//   var centerShift_y = ( canvas.height - img.height*ratio ) / 2;  
-//   ctx.clearRect(0,0,canvas.width, canvas.height);
-//   ctx.drawImage(img, 0,0, img.width, img.height,
-//                      centerShift_x,centerShift_y,img.width*ratio, img.height*ratio);  
-// }
 
 function delareImage() {
     if (isSubmiting) {
@@ -73,7 +31,7 @@ function delareImage() {
     imageCanvas.width = img.width;
     imageCanvas.height = img.height;
 
-    adjustInputElementsSize(imageCanvas); // Call function to adjust input elements size
+    adjustInputElementsSize(); // Call function to adjust input elements size
 }
 
 function draw() {
@@ -82,30 +40,30 @@ function draw() {
     ctx.drawImage(img, 0, 0, img.width, img.height);
 
     boxes.forEach((box, index) => {
+        // if (box.class !== 'table') {
         switch (box.class) {
             case 'title':
-                ctx.strokeStyle = colorTitle;
                 ctx.strokeStyle = colorTitle; // Set red color for 'title' class
                 currentColor = colorTitle;
                 break;
             case 'question':
                 ctx.strokeStyle = colorQuestion; // Set green color for 'question' class
-                ctx.strokeStyle = colorQuestion;
                 currentColor = colorQuestion;
                 break;
             case 'answer':
                 ctx.strokeStyle = colorAnswer; // Set yellow color for 'answer' class
-                ctx.strokeStyle = colorAnswer;
                 currentColor = colorAnswer;
                 break;
             case 'date':
                 ctx.strokeStyle = colorDate; // Set violet color for 'date' class
-                ctx.strokeStyle = colorDate;
                 currentColor = colorDate;
+                break;
+            case 'table':
+                ctx.strokeStyle = colorTable; // Set violet color for 'date' class
+                currentColor = colorTable;
                 break;
             default:
                 ctx.strokeStyle = currentColor; // Set default color if no specific class matches
-                break;
         }
 
         ctx.strokeStyle = selectedBox === box ? 'blue' : currentColor;
@@ -134,6 +92,7 @@ function draw() {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx.fillRect(resizingBox.startX, resizingBox.startY, resizingBox.width, resizingBox.height);
     }
+
     const boxesToSave = formatBoxesToSave(boxes);
     document.getElementById('templateDisplay').textContent = JSON.stringify(boxesToSave);
 }
@@ -186,17 +145,17 @@ function findHandle(x, y) {
         }
 
         // Calculate the center of the box
-        const centerX = bottomRightX;
-        const centerY = bottomRightY;
+        const dragPointX = topLeftX;
+        const dragPointY = topLeftY;
 
         // Calculate the distance between the mouse pointer and the center of the box
-        const distX = x - centerX;
-        const distY = y - centerY;
+        const distX = x - dragPointX;
+        const distY = y - dragPointY;
         const distance = Math.sqrt(distX * distX + distY * distY);
 
         // If the distance is within a threshold (6 in this case), consider it a resize handle
         if (distance <= 6) {
-            return { type: 'resize', boxIndex: i }; // Return resize handle type and box index
+            return { type: 'drag', boxIndex: i }; // Return resize handle type and box index
         }
 
         // Check if the mouse pointer is inside the bounding box of the current box
@@ -206,7 +165,7 @@ function findHandle(x, y) {
             y >= Math.min(topLeftY, bottomRightY) &&
             y <= Math.max(topLeftY, bottomRightY)
         ) {
-            return { type: 'drag', boxIndex: i }; // Return drag type and box index
+            return { type: 'resize', boxIndex: i }; // Return drag type and box index
         }
     }
 
@@ -273,6 +232,8 @@ function formatBoxesToSave(boxes) {
 
 // Function to load boxes data from a JSON file
 function loadBoxes(event) {
+    
+    deleteAllBoxes()
     const file = event.target.files[0]; // Get the selected file
 
     if (file) {
@@ -280,16 +241,29 @@ function loadBoxes(event) {
 
         reader.onload = function (e) {
             const loadedData = JSON.parse(e.target.result); // Parse loaded JSON data
-
             // Load boxes with their associated text from the loaded data
             boxes = loadedData.map(data => ({
-                startX: Math.round(data.box[2]),
-                startY: Math.round(data.box[3]),
-                width: Math.round(data.box[0] - data.box[2]),
-                height: Math.round(data.box[1] - data.box[3]),
+                startX: Math.round(data.box[2]*ratio),
+                startY: Math.round(data.box[3]*ratio),
+                width: Math.round((data.box[0] - data.box[2])*ratio),
+                height: Math.round((data.box[1] - data.box[3])*ratio),
                 text: data.text || '', // Ensure text property exists or set it to an empty string
                 class: data.class
             }));
+
+            for (const dataTemp of loadedData) {
+                answer_boxes = answer_boxes.concat(dataTemp.answer_text.map(data => ({
+                    startX: Math.round(data.box[2]*ratio),
+                    startY: Math.round(data.box[3]*ratio),
+                    width: Math.round((data.box[0] - data.box[2])*ratio),
+                    height: Math.round((data.box[1] - data.box[3])*ratio),
+                    text: data.text || '', // Ensure text property exists or set it to an empty string
+                    class: data.class
+                })));
+            }
+
+            boxes = boxes.concat(answer_boxes)
+
             draw();
         };
         reader.readAsText(file); // Read the contents of the file as text

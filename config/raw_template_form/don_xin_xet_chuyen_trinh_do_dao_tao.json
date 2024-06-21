@@ -1,1 +1,453 @@
-[{"box": [1333, 166, 1461, 214], "text": "don_so", "class": "question"}, {"box": [1464, 166, 1554, 214], "text": "", "class": "answer"}, {"box": [503, 330, 1308, 389], "text": "don_xin_xet_chuyen_trinh_do_dao_tao", "class": "title"}, {"box": [235, 566, 343, 616], "text": "ho_ten", "class": "question"}, {"box": [346, 566, 746, 616], "text": "", "class": "answer"}, {"box": [746, 566, 917, 616], "text": "sinh_ngay", "class": "question"}, {"box": [920, 566, 1154, 616], "text": "", "class": "answer"}, {"box": [1158, 566, 1226, 616], "text": "tai", "class": "question"}, {"box": [1228, 566, 1544, 616], "text": "", "class": "answer"}, {"box": [235, 628, 346, 679], "text": "mssv", "class": "question"}, {"box": [350, 628, 592, 679], "text": "", "class": "answer"}, {"box": [595, 628, 679, 679], "text": "lop", "class": "question"}, {"box": [682, 628, 924, 679], "text": "", "class": "answer"}, {"box": [928, 628, 1027, 679], "text": "khoa", "class": "question"}, {"box": [1030, 628, 1544, 679], "text": "", "class": "answer"}, {"box": [234, 690, 402, 740], "text": "dien_thoai", "class": "question"}, {"box": [404, 690, 776, 740], "text": "", "class": "answer"}, {"box": [779, 690, 886, 740], "text": "email", "class": "question"}, {"box": [892, 690, 1564, 740], "text": "", "class": "answer"}, {"box": [234, 756, 491, 806], "text": "sinh_vien_nganh", "class": "question"}, {"box": [492, 756, 1540, 806], "text": "", "class": "answer"}, {"box": [230, 818, 618, 873], "text": "diem_tich_luy_toan_khoa", "class": "question"}, {"box": [612, 818, 780, 873], "text": "", "class": "answer"}, {"box": [784, 818, 1017, 873], "text": "tin_chi_tich_luy", "class": "question"}, {"box": [1022, 818, 1152, 873], "text": "", "class": "answer"}, {"box": [231, 878, 764, 928], "text": "bi_buoc_thoi_hoc_theo_quyet_dinh_so", "class": "question"}, {"box": [764, 878, 1550, 928], "text": "", "class": "answer"}, {"box": [226, 1016, 611, 1072], "text": "CD_nganh", "class": "question"}, {"box": [612, 1016, 1016, 1072], "text": "", "class": "answer"}, {"box": [1015, 1016, 1160, 1072], "text": "CD_tu_hoc_ki", "class": "question"}, {"box": [1164, 1016, 1256, 1072], "text": "", "class": "answer"}, {"box": [1255, 1016, 1399, 1072], "text": "CD_nam_thu", "class": "question"}, {"box": [1402, 1016, 1532, 1072], "text": "", "class": "answer"}, {"box": [219, 1084, 607, 1138], "text": "TCCN_nganh", "class": "question"}, {"box": [608, 1084, 1014, 1138], "text": "", "class": "answer"}, {"box": [1018, 1084, 1166, 1138], "text": "TCCN_tu_hoc_ki", "class": "question"}, {"box": [1168, 1084, 1254, 1138], "text": "", "class": "answer"}, {"box": [1259, 1084, 1404, 1138], "text": "TCCN_nam_thu", "class": "question"}, {"box": [1406, 1084, 1532, 1138], "text": "", "class": "answer"}, {"box": [824, 1280, 1580, 1326], "text": "ngay_tao_don", "class": "date"}]
+[
+    {
+        "box": [
+            1568,
+            214,
+            1704,
+            270
+        ],
+        "text": "don_so",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1704,
+                    214,
+                    1804,
+                    270
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            608,
+            414,
+            1538,
+            472
+        ],
+        "text": "don_xin_xet_chuyen_trinh_do_dao_tao",
+        "class": "title",
+        "answer_text": []
+    },
+    {
+        "box": [
+            284,
+            678,
+            414,
+            740
+        ],
+        "text": "ho_ten",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    412,
+                    678,
+                    880,
+                    740
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            878,
+            678,
+            1072,
+            740
+        ],
+        "text": "sinh_ngay",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1070,
+                    678,
+                    1356,
+                    740
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1358,
+            678,
+            1432,
+            740
+        ],
+        "text": "tai",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1434,
+                    678,
+                    1828,
+                    740
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            284,
+            752,
+            417,
+            812
+        ],
+        "text": "mssv",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    420,
+                    752,
+                    704,
+                    812
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            706,
+            752,
+            797,
+            812
+        ],
+        "text": "lop",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    798,
+                    752,
+                    1090,
+                    812
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1087,
+            752,
+            1198,
+            812
+        ],
+        "text": "khoa",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1200,
+                    752,
+                    1828,
+                    812
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            284,
+            828,
+            475,
+            888
+        ],
+        "text": "dien_thoai",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    478,
+                    828,
+                    914,
+                    888
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            912,
+            828,
+            1037,
+            888
+        ],
+        "text": "email",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1038,
+                    828,
+                    1828,
+                    888
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            290,
+            904,
+            580,
+            964
+        ],
+        "text": "sinh_vien_nganh",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    582,
+                    904,
+                    1828,
+                    964
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            292,
+            976,
+            712,
+            1036
+        ],
+        "text": "diem_tich_luy_toan_khoa",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    716,
+                    976,
+                    932,
+                    1036
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            935,
+            976,
+            1186,
+            1036
+        ],
+        "text": "tin_chi_tich_luy",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1188,
+                    976,
+                    1360,
+                    1036
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            290,
+            1046,
+            886,
+            1106
+        ],
+        "text": "bi_buoc_thoi_hoc_theo_quyet_dinh_so",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    886,
+                    1046,
+                    1828,
+                    1106
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            290,
+            1208,
+            716,
+            1270
+        ],
+        "text": "bac_cd_nganh",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    718,
+                    1208,
+                    1202,
+                    1270
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1202,
+            1208,
+            1358,
+            1270
+        ],
+        "text": "cd_tu_hoc_ki",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1356,
+                    1208,
+                    1486,
+                    1270
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1484,
+            1208,
+            1630,
+            1270
+        ],
+        "text": "cd_nam_thu",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1628,
+                    1208,
+                    1830,
+                    1270
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            290,
+            1284,
+            710,
+            1344
+        ],
+        "text": "bac_tccn_nganh",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    710,
+                    1284,
+                    1200,
+                    1344
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1202,
+            1284,
+            1356,
+            1344
+        ],
+        "text": "tccn_tu_hoc_ki",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1356,
+                    1284,
+                    1486,
+                    1344
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            1486,
+            1284,
+            1632,
+            1344
+        ],
+        "text": "tccn_nam_thu",
+        "class": "question",
+        "answer_text": [
+            {
+                "box": [
+                    1632,
+                    1284,
+                    1830,
+                    1344
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    },
+    {
+        "box": [
+            980,
+            1508,
+            1874,
+            1564
+        ],
+        "text": "ngay_tao_don",
+        "class": "date",
+        "answer_text": [
+            {
+                "box": [
+                    980,
+                    1508,
+                    1874,
+                    1564
+                ],
+                "text": "",
+                "class": "answer"
+            }
+        ]
+    }
+]

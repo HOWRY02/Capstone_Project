@@ -4,7 +4,7 @@ import sys
 import json
 import time
 import yaml
-import logging
+import copy
 from PIL import Image
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -14,14 +14,12 @@ from src.OCR.detection.text_detector import TextDetector
 from src.OCR.recognition.text_recognizer import TextRecognizer
 from src.OCR.extraction.text_extractor import TextExtractor
 from src.DOC_AI.layout_analysis.layout_analyzer import LayoutAnalyzer
-from src.utils.utility import make_underscore_name, get_text_image, preprocess_image, align_images, find_class_of_box, draw_layout_result, find_relative_position
+from src.utils.utility import make_underscore_name, get_text_image, preprocess_image, align_images, find_class_of_box, draw_layout_result, find_relative_position, find_text_in_big_box
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
 STATUS = doc_config["status"]
 
-logging.getLogger().setLevel(logging.ERROR)
-os.environ['CURL_CA_BUNDLE'] = ''
 
 class InfoExtracter():
     __instance__ = None
@@ -50,11 +48,12 @@ class InfoExtracter():
         Input: input image
         Output: template image, template json file
         """
+        print(image.shape)
         start_time = time.time()
         status_code = "200"
         
         # preprocess image (~8s)
-        image = preprocess_image(image)
+        # image = preprocess_image(image)
 
         title = {'box':[], 'text':[]}
 
@@ -62,20 +61,17 @@ class InfoExtracter():
         layout_document = self.layout_analyzer.predict(image)
 
         # find template boxes
-        title_boxes = layout_document['title']['box'].copy()
+        title['box'] = layout_document['title']['box'].copy()
 
         # find template title
-        title_texts = []
-        for box in title_boxes:
+        for box in title['box']:
             cropped_image = get_text_image(image, box)
             cropped_image = Image.fromarray(cropped_image)
             rec_template = self.recognizer.recognize(cropped_image)
-            title_texts.append(rec_template)
+            title['text'].append(rec_template)
 
-        title['box'] = title_boxes
-        title['text'] = title_texts
-        print(title_texts)
-        form_name, position_of_form_name = self.text_extractor.extract_form_name(title)
+        print(title['text'])
+        form_name, _ = self.text_extractor.extract_form_name(title)
         form_name = make_underscore_name([form_name])[0]
 
         with open(f"config/template_form/{form_name}.json", 'r') as file:
@@ -84,33 +80,40 @@ class InfoExtracter():
 
         aligned = align_images(image, template_image, debug=False)
 
-        layout_template = self.layout_analyzer.predict(aligned)
+        detection = self.detector.detect(aligned)
+        detection.reverse()
 
         for loc in template:
-            [x_t, y_t, x_b, y_b] = loc['box']
-            roi = aligned[y_t:y_b, x_t:x_b]
-            cropped_image = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
-            ocr_text = self.find_text_in_big_box(cropped_image)
-            loc['ocr_text'] = ocr_text
+            for answer in loc['answer_text']:
+                answer_box = []
+                for box in detection:
+                    temp_box = copy.deepcopy(box)
+                    if box[0][0] < answer['box'][0] and box[1][0] > answer['box'][0]:
+                        temp_box[0][0] = answer['box'][0]
+                        temp_box[3][0] = answer['box'][0]
+                    if box[0][0] < answer['box'][2] and box[1][0] > answer['box'][2]:
+                        temp_box[1][0] = answer['box'][2]
+                        temp_box[2][0] = answer['box'][2]
+                    area_temp_box = (temp_box[1][0]-temp_box[0][0])*(temp_box[3][1]-temp_box[0][1])
+                    area_box = (answer['box'][2]-answer['box'][0])*(answer['box'][3]-answer['box'][1])
+                    if area_temp_box/area_box > 0.1:
+                        relative_position = find_relative_position(answer['box'], temp_box)
+                        if relative_position == 0:
+                            answer_box.append(temp_box)
 
-        table_question = []
-        table_answer = []
-        for i, loc in enumerate(template):
-            class_of_box = find_class_of_box(loc['box'], layout_template)
-            if class_of_box == 'table':
-                if loc['class'] == 'question':
-                    table_question.append(loc['text'])
-                else:
-                    loc['text'] = table_question[len(table_answer)] if len(table_question) != 0 else ''
-                    table_answer.append(loc['text'])
-            else:
-                if loc['class'] == 'answer':
-                    loc['text'] = template[i-1]['text']
-        
+                answer['temp_box'] = answer_box
+
         result = []
-        for i, loc in enumerate(template):
-            if loc['class'] != 'question':
-                result.append(loc)
+        for loc in template:
+            for answer in loc['answer_text']:
+                for box in answer['temp_box']:
+                    cropped_image = get_text_image(aligned, box)
+                    cropped_image = Image.fromarray(cropped_image)
+                    rec_result = self.recognizer.recognize(cropped_image)
+                    answer['text'] += rec_result
+                answer.pop('temp_box', None)
+
+            result.append(loc)
 
         if is_visualize:
             layout_img = draw_layout_result(image, layout_document, box_width=2, box_alpha=0.1)
@@ -122,36 +125,9 @@ class InfoExtracter():
         return result, status_code, [aligned]
 
 
-    def find_text_in_big_box(self, image):
-        # detect all boxes in image
-        detection = self.detector.detect(image)
-        if detection is not None:
-            detection.sort(key = lambda x: x[0][1])
-            for i, box in enumerate(detection):
-                relative_position = find_relative_position(detection[i-1], box)
-                if relative_position == 1:
-                    detection[i][0][1] = min(detection[i-1][0][1], box[0][1])
-                    detection[i-1][0][1] = min(detection[i-1][0][1], box[0][1])
-            detection.sort(key = lambda x: (x[0][1], x[0][0]))
-
-            # recognize all texts
-            recognition = []
-            for box in detection:
-                cropped_image = get_text_image(image, box)
-                cropped_image = Image.fromarray(cropped_image)
-                rec_template = self.recognizer.recognize(cropped_image)
-                recognition.append(rec_template)
-
-            text = ' '.join(recognition)
-        else:
-            text = ''
-
-        return text
-
-
 if __name__ == "__main__":
 
-    img_path = "data/printed_file/don_mien_thi_1.png"
+    img_path = "data/written_file/400_DPI_resized/don_mien_thi_1.png"
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     info_extracter = InfoExtracter()
     template, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)

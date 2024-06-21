@@ -18,7 +18,6 @@ async function fetchMappingData() {
     }
 }
 mapping = fetchMappingData()
-console.log(mapping)
 
 async function displayFields(boxes) {
     // Select the resultHeading for adjust the font size
@@ -27,8 +26,7 @@ async function displayFields(boxes) {
     // Select the display-list div
     const displayListDiv = document.getElementById("display-list");
 
-    // Select the listElement to display the json 
-    const listElement = document.getElementById('listElement');
+    // Select the listElement to display the json
     const titleElement = document.getElementById('titleList');
     const questionElement = document.getElementById('questionList');
     const dateElement = document.getElementById('dateList');
@@ -50,52 +48,40 @@ async function displayFields(boxes) {
     resultHeading.style.fontSize = `${scaleFactor * 14}px`; // Adjust font size based on canvas size
 
 
-
     boxes.forEach(async item => {
         const listContainer = document.createElement('ul')
         const listItem = document.createElement('li');
         const map = await mapping;
         listItem.textContent = map[item.text] || "Key not found in mapping";
+        // listItem.textContent = item.text || "Key not found in mapping";
         if (listItem.textContent == "Key not found in mapping") {
             listItem.textContent = item.text;
-        };
+        }
+
         if (item.class.includes('title')) {
             //add item.text to the content of titleList as a list
             listContainer.appendChild(listItem)
             titleElement.appendChild(listContainer);
-        }
-
-        else if (item.class.includes('question')) {
+        } else if (item.class.includes('question')) {
             //add item.text to the content of titleList as a list
             listContainer.appendChild(listItem)
             questionElement.appendChild(listContainer);
-        }
-
-        else if (item.class.includes('date')) {
+        } else if (item.class.includes('date')) {
             //add item.text to the content of titleList as a list
             listContainer.appendChild(listItem)
             dateElement.appendChild(listContainer);
         }
-        else if (item.class.includes('answer')) {
-            //add item.text to the content of titleList as a list
-            listContainer.appendChild(listItem)
-            answerElement.appendChild(listContainer);
-        }
-
-
     });
 }
 
 // Function to handle the event
 async function handleEvent() {
     const jsonData = document.getElementById('templateDisplay').textContent;
-    console.log(jsonData); // Check the content of jsonData
+    // console.log(jsonData); // Check the content of jsonData
 
-    try {
+    if (jsonData) {
         const parsedData = JSON.parse(jsonData); // Parse the JSON string
         displayFields(parsedData); // Pass the parsed array to displayFields
-    } catch (error) {
-        console.error('Error parsing JSON:', error);
     }
 }
 

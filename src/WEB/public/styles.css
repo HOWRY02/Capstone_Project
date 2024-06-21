@@ -1,5 +1,7 @@
 .root-container {
-    body, html {
+
+    body,
+    html {
         height: 100%;
         margin: 0;
         overflow: hidden;
@@ -136,7 +138,7 @@
 
     /* Optional: You can add more styling to the button (hover effects, etc.) */
     #answerButton:hover {
-        background-color: #380e5d;
+        background-color: #780adab6;
     }
 
     #titleButton {
@@ -163,6 +165,19 @@
     /* Optional: You can add more styling to the button (hover effects, etc.) */
     #dateButton:hover {
         background-color: #0eaab6;
+    }
+
+    #tableButton {
+        padding: 8px 15px;
+        background-color: #ffe923;
+        /* color: #fff; */
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Optional: You can add more styling to the button (hover effects, etc.) */
+    #tableButton:hover {
+        background-color: #ffe600bb;
     }
 
     #saveButton {
@@ -222,7 +237,7 @@
     }
 
     #homeButton {
-        font-size: 80px;
+        font-size: 40px;
         border: none;
         cursor: pointer;
         background-color: #0a0a23;
@@ -230,7 +245,7 @@
     }
 
     #extractButton {
-        font-size: 80px;
+        font-size: 40px;
         border: none;
         cursor: pointer;
         background-color: #0a0a23;
@@ -369,7 +384,7 @@
 
     #homeButton {
         font-size: 80px;
-        border: none;
+        /* border: none; */
         cursor: pointer;
         background-color: #0a0a23;
         color: #fff;
@@ -377,10 +392,49 @@
 
     #createButton {
         font-size: 80px;
-        border: none;
+        /* border: none; */
         cursor: pointer;
         background-color: #0a0a23;
         color: #fff;
+    }
+
+    #menubar {
+        background-color: #3498db;
+        color: #fff;
+    }
+}
+
+.show-data-container {
+    body {
+        font-family: sans-serif;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+    }
+
+    .table-selection,
+    .search-bar {
+        margin-bottom: 10px;
+    }
+
+    .data-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        text-align: left;
+        background-color: #f2f2f2;
     }
 
     #menubar {

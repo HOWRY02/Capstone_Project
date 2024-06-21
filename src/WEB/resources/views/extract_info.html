@@ -19,7 +19,6 @@
         <div class="container">
             <div class="left-column">
                 <form action="/extractingInfo/rec" enctype="multipart/form-data" method="POST" >
-                    
                     <input type="file" id="imageInput" name="imageInput" accept="image/*" >
                     <button id="submitButton"><i class="fa-regular fa-image"></i> Submit</button>
                 </form>
@@ -43,7 +42,6 @@
 
     <script src="{{ url_for('static', path='/resources/script/extract_info/utility.js') }}"></script>
     <script src="{{ url_for('static', path='/resources/script/extract_info/main.js') }}"></script>
-    <script src="{{ url_for('static', path='/resources/script/extract_info/display_data.js') }}"></script>
 </body>
 
 </html>

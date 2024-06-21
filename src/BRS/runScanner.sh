@@ -1,0 +1,1 @@
+cd ./data/scanned_data && scanimage --mode "True Gray" --resolution 1200 --format png --batch=doc_%d.png -x "210" -y "297"
