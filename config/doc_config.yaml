@@ -1,7 +1,2 @@
 status:
-  '200': 'succeed'
-  '460': 'detection error - cannot find any text in document'
-  '461': 'recognition error - cannot recognize text in document'
-  '470': "template error - only support table format"
-  '473': "image error - no image or url format is incorrect"
-  '474': "language code error - no support this language, current support vi,en"
+    "200": "succeed"
