@@ -191,7 +191,7 @@ async def create_table_proceed(data: JSONData):
 
         data_dict = format_data_dict(data_dict)
         with open(f"config/template_form/{table_name}.json", 'w', encoding='utf-8') as outfile:
-            json.dump(data_dict, outfile, ensure_ascii=True)
+            json.dump(data_dict, outfile, ensure_ascii=False)
 
         return {"message": f"Table '{table_name}' created successfully."}
     except Exception as e:
