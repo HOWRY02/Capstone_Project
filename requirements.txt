@@ -1,26 +1,16 @@
-setuptools==67.0.0 # fix bugs about: DeprecationWarning: pkg_resources is deprecated as an API.
-tqdm
-Unidecode
-thefuzz
-datefinder
-shapely
-lmdb
-pyclipper
-scikit-learn
-PPOCRLabel
-trash-cli
-fastapi
-python-multipart
-uvicorn[standard]
-Pillow < 10.0
-scipy
-ultralytics==8.0.28
-einops==0.2.0
-opencv-contrib-python
-jinja2
-mysql-connector-python
-imutils
-#CPU
-paddlepaddle==2.4.2 -i https://mirror.baidu.com/pypi/simple
-#Cuda 11.7
-# paddlepaddle-gpu==2.4.2.post117 -f https://www.paddlepaddle.org.cn/whl/linux/mkl/avx/stable.html
+datasets==2.19.2
+huggingface_hub==0.23.3
+opencv-contrib-python==4.10.0.82
+Pillow==10.3.0
+paddlepaddle==2.6.1
+
+scikit-image==0.23.2
+imgaug==0.4.0
+pyclipper==1.3.0.post5
+lmdb==1.4.1
+torch==2.3.1
+torchvision==0.18.1
+einops==0.8.0
+imutils==0.5.4
+Unidecode==1.3.8
+pandas==2.2.2
