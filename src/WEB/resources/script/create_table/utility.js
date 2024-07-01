@@ -16,7 +16,7 @@ function adjustInputElementsSize() {
     const button_class = document.querySelectorAll('#homeButton, #extractButton, #submitButton, #questionButton, #answerButton, #titleButton, #dateButton, #tableButton');
     button_class.forEach(button => {
         button.style.fontSize = `${scaleFactor * 12}px`; // Adjust button font size
-        button.style.padding = `${scaleFactor * 6}px ${scaleFactor * 13}px`; // Adjust button padding
+        button.style.padding = `${scaleFactor * 6}px ${scaleFactor * 12}px`; // Adjust button padding
     });
 }
 

@@ -32,7 +32,7 @@ let colorAnswer = 'purple';
 let colorDate = 'blue';
 let currentColor = colorTitle;
 const WIDTH = 1000;
-const scaleFactor = 1.5039999389648437;
+const scaleFactor = 1.5;
 
 tempImg = new Image();
 tempImg.onload = function () {

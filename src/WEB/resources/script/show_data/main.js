@@ -25,7 +25,7 @@ document.getElementById('table-select').addEventListener('change', function () {
 
 // Function to fetch and display table data
 function fetchTableData(table, searchTerm = '') {
-    let url = `/tables/${table}`;
+    let url = `/showingData/${table}`;
     if (searchTerm) {
         url += `/search?search_term=${searchTerm}`; // Add search query parameter
     }
@@ -137,7 +137,7 @@ document.getElementById('export-data-btn').addEventListener('click', function ()
 });
 
 // function scanDocument() {
-//     fetch('/tables/scan', {
+//     fetch('/showingData/scan', {
 //         method: 'POST',
 //         headers: {
 //             'Content-Type': 'application/json'
