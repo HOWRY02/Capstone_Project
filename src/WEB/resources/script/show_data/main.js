@@ -162,4 +162,7 @@ document.getElementById('homeButton').addEventListener('click', function () {
     window.location.href = '/'; // This navigates to index.html
 });
 
-
+// JavaScript to handle button click and navigate to create_table.html
+document.getElementById('createButton').addEventListener('click', function () {
+    window.location.href = '/creatingTable'; // This navigates to create_table.html
+});

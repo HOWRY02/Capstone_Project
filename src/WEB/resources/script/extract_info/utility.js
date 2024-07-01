@@ -13,7 +13,7 @@ function adjustInputElementsSize() {
     });
 
     // Adjust padding for question and title buttonz
-    const button_class = document.querySelectorAll('#homeButton, #createButton, #submitButton, #scanButton');
+    const button_class = document.querySelectorAll('#homeButton, #createButton, #showButton, #submitButton, #scanButton');
     button_class.forEach(button => {
         button.style.fontSize = `${scaleFactor * 12}px`; // Adjust button font size
         button.style.padding = `${scaleFactor * 6}px ${scaleFactor * 12}px`; // Adjust button padding

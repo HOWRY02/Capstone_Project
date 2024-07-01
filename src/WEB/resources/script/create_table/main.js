@@ -309,3 +309,8 @@ document.getElementById('homeButton').addEventListener('click', function () {
 document.getElementById('extractButton').addEventListener('click', function () {
     window.location.href = '/extractingInfo'; // This navigates to index.html
 });
+
+// JavaScript to handle button click and navigate to create_table.html
+document.getElementById('showButton').addEventListener('click', function () {
+    window.location.href = '/showingData'; // This navigates to create_table.html
+});

@@ -252,6 +252,14 @@
         color: #fff;
     }
 
+    #showButton {
+        font-size: 80px;
+        /* border: none; */
+        cursor: pointer;
+        background-color: #0a0a23;
+        color: #fff;
+    }
+
     #menubar {
         background-color: #3498db;
         color: #fff;
@@ -415,6 +423,14 @@
         color: #fff;
     }
 
+    #showButton {
+        font-size: 80px;
+        /* border: none; */
+        cursor: pointer;
+        background-color: #0a0a23;
+        color: #fff;
+    }
+
     #menubar {
         background-color: #3498db;
         color: #fff;
@@ -460,6 +476,15 @@
     }
 
     #homeButton {
+        font-size: 18px;
+        padding: 9px 18px;
+        /* border: none; */
+        cursor: pointer;
+        background-color: #0a0a23;
+        color: #fff;
+    }
+
+    #createButton {
         font-size: 18px;
         padding: 9px 18px;
         /* border: none; */
