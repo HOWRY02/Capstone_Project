@@ -223,11 +223,11 @@ def draw_result_text(img, text,
     text_size, _ = cv2.getTextSize(text, font, font_scale, font_thickness)
     text_w, text_h = text_size
     cv2.rectangle(img, pos, (x + text_w, y + text_h), text_color_bg, -1)
-    cv2.putText(img, text, (x, y + text_h + font_scale - 1), font, font_scale, text_color, font_thickness)
+    cv2.putText(img, text, (x, int(y + text_h + font_scale - 1)), font, font_scale, text_color, font_thickness)
 
     return text_size
 
-def draw_layout_result(image, layout_result, box_width=5, box_alpha=0.2):
+def draw_layout_result(image, layout_result, box_width=5, box_alpha=0.2, font_scale=1, font_thickness=1):
 
     new_image = image.copy()
     color_of_class = {'text':(0,0,255), 'title':(255,0,0),
@@ -250,7 +250,7 @@ def draw_layout_result(image, layout_result, box_width=5, box_alpha=0.2):
             new_image = cv2.addWeighted(overlay, box_alpha, new_image, 1 - box_alpha, 0)
 
             text = key_layout + ' ' + str(round(value_layout['confidence'][i], 2))
-            draw_result_text(new_image, text, font_scale=1, pos=top_left, text_color_bg=(255, 255, 255))
+            draw_result_text(new_image, text, pos=top_left, font_scale=font_scale, font_thickness=font_thickness, text_color_bg=(255, 255, 255))
 
     return new_image
 
