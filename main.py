@@ -101,7 +101,7 @@ async def creatingTable(request: Request,
                         imageInput: UploadFile = File()):
     global scale_factor
     image = load_image(imageInput.file)
-    template, status_code, [] = table_creater.create_table(image, is_visualize=False)
+    template, status_code, [] = table_creater.create_table(image, is_visualize=True)
 
     # save the raw image
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', image)
@@ -123,7 +123,7 @@ async def extractingInfo(request: Request,
                          imageInput: UploadFile = File()):
     global scale_factor
     image = load_image(imageInput.file)
-    result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=False)
+    result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)
 
     # save the aligned image
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', aligned)
@@ -318,6 +318,7 @@ async def create_table_proceed(request: Request):
     
     image = cv2.imread("data/scanned_data/doc_1.png")
     image = imutils.resize(image, width=2000)
+    cv2.imwrite(f'data/scanned_data/doc_1.png', image)
 
     result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=False)
 
