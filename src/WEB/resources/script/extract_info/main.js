@@ -32,7 +32,7 @@ let colorAnswer = 'purple';
 let colorDate = 'blue';
 let currentColor = colorTitle;
 const WIDTH = 1000;
-const scaleFactor = 1.5039999389648437;
+const scaleFactor = 1.5;
 
 tempImg = new Image();
 tempImg.onload = function () {
@@ -278,4 +278,9 @@ document.getElementById('homeButton').addEventListener('click', function () {
 // JavaScript to handle button click and navigate to create_table.html
 document.getElementById('createButton').addEventListener('click', function () {
     window.location.href = '/creatingTable'; // This navigates to create_table.html
+});
+
+// JavaScript to handle button click and navigate to create_table.html
+document.getElementById('showButton').addEventListener('click', function () {
+    window.location.href = '/showingData'; // This navigates to create_table.html
 });

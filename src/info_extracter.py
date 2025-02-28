@@ -14,7 +14,7 @@ from src.OCR.detection.text_detector import TextDetector
 from src.OCR.recognition.text_recognizer import TextRecognizer
 from src.OCR.extraction.text_extractor import TextExtractor
 from src.DOC_AI.layout_analysis.layout_analyzer import LayoutAnalyzer
-from src.utils.utility import make_underscore_name, get_text_image, preprocess_image, align_images, find_class_of_box, draw_layout_result, find_relative_position, find_text_in_big_box
+from src.utils.utility import make_underscore_name, get_text_image, preprocess_image, align_images, find_class_of_box, draw_layout_result, find_relative_position, find_text_in_big_box, remove_special_characters
 
 with open("./config/doc_config.yaml", "r") as f:
     doc_config = yaml.safe_load(f)
@@ -48,12 +48,13 @@ class InfoExtracter():
         Input: input image
         Output: template image, template json file
         """
-        print(image.shape)
+        # print(image.shape)
         start_time = time.time()
         status_code = "200"
         
-        # preprocess image (~8s)
-        # image = preprocess_image(image)
+        # preprocess image
+        image = preprocess_image(image)
+        # cv2.imwrite('result/preprocessed_img.jpg', image)
 
         title = {'box':[], 'text':[]}
 
@@ -79,6 +80,7 @@ class InfoExtracter():
         template_image = cv2.imread(f"config/template/{form_name}.jpg")
 
         aligned = align_images(image, template_image, debug=False)
+        # cv2.imwrite('result/aligned_img.jpg', aligned)
 
         detection = self.detector.detect(aligned)
         detection.reverse()
@@ -110,10 +112,15 @@ class InfoExtracter():
                     cropped_image = get_text_image(aligned, box)
                     cropped_image = Image.fromarray(cropped_image)
                     rec_result = self.recognizer.recognize(cropped_image)
+                    # answer['text'] += remove_special_characters(rec_result)
                     answer['text'] += rec_result
                 answer.pop('temp_box', None)
 
             result.append(loc)
+
+        # print(result)
+        with open(f"result/result.json", 'w', encoding='utf-8') as outfile:
+            json.dump(result, outfile, ensure_ascii=False)
 
         if is_visualize:
             layout_img = draw_layout_result(image, layout_document, box_width=2, box_alpha=0.1)
@@ -127,7 +134,7 @@ class InfoExtracter():
 
 if __name__ == "__main__":
 
-    img_path = "data/written_file/400_DPI_resized/don_mien_thi_1.png"
+    img_path = "data/written_data/400_DPI_resized/don_xin_mien_thi_anh_van_dau_ra_6.png"
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     info_extracter = InfoExtracter()
     template, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)

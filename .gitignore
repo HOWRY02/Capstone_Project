@@ -9,6 +9,6 @@ __pycache__
 *.jpg
 */*/*.pth
 */*/*/*.pth
-data*
+# data*
 result*
 test*

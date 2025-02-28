@@ -47,12 +47,13 @@ class TableCreater():
         Input: input image
         Output: result image, result json file
         """
-        print(image.shape)
+        # print(image.shape)
         start_time = time.time()
         status_code = "200"
 
         # preprocess image
         # image = preprocess_image(image)
+        # cv2.imwrite('result/preprocessed_img.jpg', image)
 
         template = {'title':    {'box':[], 'text':[]},
                     'question': {'box':[], 'text':[]},
@@ -112,7 +113,7 @@ class TableCreater():
 
 if __name__ == "__main__":
 
-    img_path = "data/scanned_data_form/1200_DPI_PNG_RISIZED/don_xin_mien_thi.png"
+    img_path = "data/form_data/don_mien_thi.png"
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     table_creater = TableCreater()
     template_json, status_code, [] = table_creater.create_table(image)

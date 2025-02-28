@@ -151,7 +151,8 @@ def align_images(image, template, debug=False):
                    singlePointColor = (255,0,0),
                    matchesMask = matchesMask,
                    flags = cv2.DrawMatchesFlags_DEFAULT)
-        matchedVis = cv2.drawMatchesKnn(image, kpsA, template, kpsB, matches, None, **draw_params)
+        matchedVis = cv2.drawMatchesKnn(image, kpsA, template, kpsB, raw_matches, None, **draw_params)
+        cv2.imwrite('result/sift_img.jpg', matchedVis)
         matchedVis = imutils.resize(matchedVis, width=1000)
         cv2.imshow("Matched Keypoints", matchedVis)
         cv2.waitKey(0)
@@ -190,7 +191,7 @@ def preprocess_image(image):
 
     # Applying CLAHE to L-channel
     # feel free to try different values for the limit and grid size:
-    clahe = cv2.createCLAHE(clipLimit=15.0, tileGridSize=(2,2)) # clipLimit=15 2,2
+    clahe = cv2.createCLAHE(clipLimit=8, tileGridSize=(2,2)) # clipLimit=15 2,2
     cl = clahe.apply(l_channel)
 
     # Merge the CLAHE enhanced L-channel with the a and b channel
@@ -211,6 +212,41 @@ def preprocess_image(image):
 
     return result_img
 
+# def preprocess_image(image):
+#     """
+#     Preprocess image
+#     Input: opencv image
+#     Output: preprocessed image
+#     """
+#     img = imutils.resize(image, width=5000)
+
+#     # Increase contrast
+#     lab_img = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+#     l_channel, a, b = cv2.split(lab_img)
+
+#     # Applying CLAHE to L-channel
+#     # feel free to try different values for the limit and grid size:
+#     clahe = cv2.createCLAHE(clipLimit=12.0, tileGridSize=(2,2)) # clipLimit=15 2,2
+#     cl = clahe.apply(l_channel)
+
+#     # Merge the CLAHE enhanced L-channel with the a and b channel
+#     limg = cv2.merge((cl,a,b))
+
+#     # Converting image from LAB Color model to GRAY color space
+#     brg_img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+#     gray_img = cv2.cvtColor(brg_img, cv2.COLOR_BGR2GRAY)
+
+#     # Remove noise
+#     thresh = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+#     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,1))
+#     binary_img = 255 - cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
+
+#     # Resize image
+#     result_img = imutils.resize(binary_img, width=2000)
+#     result_img = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
+
+#     return result_img
+
 def draw_result_text(img, text,
                      font=cv2.FONT_HERSHEY_COMPLEX,
                      pos=(0, 0),
@@ -223,11 +259,11 @@ def draw_result_text(img, text,
     text_size, _ = cv2.getTextSize(text, font, font_scale, font_thickness)
     text_w, text_h = text_size
     cv2.rectangle(img, pos, (x + text_w, y + text_h), text_color_bg, -1)
-    cv2.putText(img, text, (x, y + text_h + font_scale - 1), font, font_scale, text_color, font_thickness)
+    cv2.putText(img, text, (x, int(y + text_h + font_scale - 1)), font, font_scale, text_color, font_thickness)
 
     return text_size
 
-def draw_layout_result(image, layout_result, box_width=5, box_alpha=0.2):
+def draw_layout_result(image, layout_result, box_width=5, box_alpha=0.2, font_scale=1, font_thickness=1):
 
     new_image = image.copy()
     color_of_class = {'text':(0,0,255), 'title':(255,0,0),
@@ -250,7 +286,7 @@ def draw_layout_result(image, layout_result, box_width=5, box_alpha=0.2):
             new_image = cv2.addWeighted(overlay, box_alpha, new_image, 1 - box_alpha, 0)
 
             text = key_layout + ' ' + str(round(value_layout['confidence'][i], 2))
-            draw_result_text(new_image, text, font_scale=1, pos=top_left, text_color_bg=(255, 255, 255))
+            draw_result_text(new_image, text, pos=top_left, font_scale=font_scale, font_thickness=font_thickness, text_color_bg=(255, 255, 255))
 
     return new_image
 

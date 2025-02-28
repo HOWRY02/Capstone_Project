@@ -252,6 +252,14 @@
         color: #fff;
     }
 
+    #showButton {
+        font-size: 80px;
+        /* border: none; */
+        cursor: pointer;
+        background-color: #0a0a23;
+        color: #fff;
+    }
+
     #menubar {
         background-color: #3498db;
         color: #fff;
@@ -309,6 +317,23 @@
     /* Optional: You can add more styling to the button (hover effects, etc.) */
     #submitButton:hover {
         background-color: #898a8a;
+    }
+
+    #scanButton {
+        padding: 8px 15px;
+        /* color: #fff; */
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Optional: You can add more styling to the button (hover effects, etc.) */
+    #scanButton:hover {
+        background-color: #898a8a;
+    }
+
+    .inner
+    {
+        display: inline-block;
     }
 
     #updateButton {
@@ -398,6 +423,14 @@
         color: #fff;
     }
 
+    #showButton {
+        font-size: 80px;
+        /* border: none; */
+        cursor: pointer;
+        background-color: #0a0a23;
+        color: #fff;
+    }
+
     #menubar {
         background-color: #3498db;
         color: #fff;
@@ -439,6 +472,24 @@
 
     #menubar {
         background-color: #3498db;
+        color: #fff;
+    }
+
+    #homeButton {
+        font-size: 18px;
+        padding: 9px 18px;
+        /* border: none; */
+        cursor: pointer;
+        background-color: #0a0a23;
+        color: #fff;
+    }
+
+    #createButton {
+        font-size: 18px;
+        padding: 9px 18px;
+        /* border: none; */
+        cursor: pointer;
+        background-color: #0a0a23;
         color: #fff;
     }
 }
