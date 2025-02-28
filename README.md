@@ -69,7 +69,7 @@ To run this project locally, follow these steps:
 This project is licensed under the [License Name, e.g., MIT License] - see the LICENSE file for details.
 
 ## Acknowledgments
- - Thanks to our professor, [Name], for guidance.
+ - Thanks to our professor, Duc Bui Ha, PhD, for guidance.
  - Inspired by various OCR tools and libraries.
 
 ## Contact
