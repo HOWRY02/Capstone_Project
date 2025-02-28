@@ -101,7 +101,7 @@ async def creatingTable(request: Request,
                         imageInput: UploadFile = File()):
     global scale_factor
     image = load_image(imageInput.file)
-    template, status_code, [] = table_creater.create_table(image, is_visualize=False)
+    template, status_code, [] = table_creater.create_table(image, is_visualize=True)
 
     # save the raw image
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', image)
@@ -123,7 +123,7 @@ async def extractingInfo(request: Request,
                          imageInput: UploadFile = File()):
     global scale_factor
     image = load_image(imageInput.file)
-    result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=False)
+    result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=True)
 
     # save the aligned image
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', aligned)
@@ -191,7 +191,7 @@ async def create_table_proceed(data: JSONData):
 
         data_dict = format_data_dict(data_dict)
         with open(f"config/template_form/{table_name}.json", 'w', encoding='utf-8') as outfile:
-            json.dump(data_dict, outfile, ensure_ascii=True)
+            json.dump(data_dict, outfile, ensure_ascii=False)
 
         return {"message": f"Table '{table_name}' created successfully."}
     except Exception as e:
@@ -262,7 +262,7 @@ async def get_available_tables():
         return {"message": "Error retrieving table names."}
 
 # Endpoint to retrieve all data from a specific table
-@app.get("/tables/{table_name}")
+@app.get("/showingData/{table_name}")
 async def get_table_data(table_name: str):
     if not check_table_exists(table_name):
         return {"message": f"Table '{table_name}' does not exist."}
@@ -284,7 +284,7 @@ async def get_table_data(table_name: str):
         return {"message": "Error retrieving data."}
 
 
-@app.get("/tables/{table_name}/search")
+@app.get("/showingData/{table_name}/search")
 async def search_table_data(table_name: str, search_term: str = None):
     if not check_table_exists(table_name):
         return {"message": f"Table '{table_name}' does not exist."}
@@ -308,8 +308,9 @@ async def search_table_data(table_name: str, search_term: str = None):
         return {"message": "Error retrieving data."}
 
 
-@app.post("/tables/scan")
+@app.post("/showingData/scan")
 async def create_table_proceed(request: Request):
+    global scale_factor
     try:
         result = subprocess.run(["sh", "./src/BRS/runScanner.sh"], stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
     except Exception as e:
@@ -317,12 +318,21 @@ async def create_table_proceed(request: Request):
     
     image = cv2.imread("data/scanned_data/doc_1.png")
     image = imutils.resize(image, width=2000)
+    cv2.imwrite(f'data/scanned_data/doc_1.png', image)
 
     result, status_code, [aligned] = info_extracter.extract_info(image, is_visualize=False)
 
     cv2.imwrite(f'src/WEB/public/img/temp_img.jpg', aligned)
+    # save the resized image
+    scale_factor = 1000 / aligned.shape[1]
+    resized_img = imutils.resize(aligned, width=1000)
+    cv2.imwrite(f'src/WEB/public/img/resized_img.jpg', resized_img)
+    # apply scale factor for display on the web
+    result = scale_box(result, scale_factor)
     
-    return templates.TemplateResponse("extract_info.html", {"request": request, "imagePath": 'public/img/temp_img.jpg', "jsonData": result})
+    return templates.TemplateResponse("extract_info.html", {"request": request,
+                                                            "imagePath": 'public/img/resized_img.jpg',
+                                                            "jsonData": result})
 
 
 # Run the application (optional, for development purposes)

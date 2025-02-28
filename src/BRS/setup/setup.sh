@@ -37,8 +37,11 @@ dpkg -i --force-all "brscan-skey-0.3.2-0.amd64.deb"
 
 
 # Configure brscan3 (assuming correct arguments)
-brsaneconfig3 -a name=mq model=MFC-795CW ip=192.168.1.8
+brsaneconfig3 -a name=phuc model=MFC-795CW ip=192.168.173.016
 
+# Remove nrscan3
+
+brsaneconfig3 -r NAME
 # Run brscan-skey
 brscan-skey
 

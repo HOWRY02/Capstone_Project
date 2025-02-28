@@ -2,7 +2,7 @@ const imageInput = document.getElementById('imageInput');
 const imageCanvas = document.getElementById('imageCanvas');
 const ctx = imageCanvas.getContext('2d');
 const formImage = document.getElementById("formImage");
-const imgSrc = formImage.src;
+let imgSrc = formImage.src;
 const boxesString = document.getElementById("hiddenJsonData").textContent.replace(/'/g, '"');
 const boxesTemp = JSON.parse(boxesString);
 const initRatioString = document.getElementById("hiddenScaleFactor").textContent;
@@ -308,4 +308,9 @@ document.getElementById('homeButton').addEventListener('click', function () {
 // JavaScript to handle button click and navigate to index.html
 document.getElementById('extractButton').addEventListener('click', function () {
     window.location.href = '/extractingInfo'; // This navigates to index.html
+});
+
+// JavaScript to handle button click and navigate to create_table.html
+document.getElementById('showButton').addEventListener('click', function () {
+    window.location.href = '/showingData'; // This navigates to create_table.html
 });
